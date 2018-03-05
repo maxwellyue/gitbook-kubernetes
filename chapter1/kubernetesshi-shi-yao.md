@@ -35,7 +35,5 @@ Kubernetes：
 * 不提供应用级别的服务，比如中间件（如消息总线等）、数据处理框架（比如Spark）、数据库（比如MySQL）、缓存以及集群存储系统（如Ceph），这些不会被当做内建的服务。这些组件可以运行在kubernetes中，也可以被运行在kubernetes中的应用通过向去访问。
 * 不会提出日志、监控以及报警的解决方案，它会提供一些integrations as proof of concept, and mechanisms to collect and export metrics。
 * 
-# 
-
 
 
