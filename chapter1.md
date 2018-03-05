@@ -16,11 +16,9 @@
 
 * 集群中其他非Master节点都会运行下列两个进程：
 
-  ```
-              kubelet：该进程会和Kubernetes 的Master结点进行交互。
+  * kubelet：该进程会和Kubernetes 的Master结点进行交互。
+  * kube-proxy：该进程是Kubernetes网络服务的网络代理。
 
-              kube-proxy：该进程是Kubernetes网络服务的网络代理。
-  ```
 
 ---
 
@@ -60,6 +58,4 @@ Kubernetes负责维护你期望的集群状态。当你和Kubernetes进行交互
 ### Kubernetes Nodes
 
 集群中的Nodes是指运行application或cloud workflows的机器（如VM，物理机等等）。kubernetes Master控制每一个节点，通常会很少直接与Nodes进行交互。
-
-
 
