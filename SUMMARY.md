@@ -3,7 +3,7 @@
 * [介绍](README.md)
 * [Kubernetes概述](chapter1.md)
   * [Kubernetes是什么](chapter1/kubernetesshi-shi-yao.md)
-  * Kubernetes组件
+  * [Kubernetes组件](chapter1/kuberneteszu-jian.md)
   * Kubernetes API
   * [Kubernetes 中的对象](chapter1/kubernetes-zhong-de-dui-xiang.md)
     * [理解Kubernetes对象](chapter1/kubernetes-zhong-de-dui-xiang/li-jiekubernetes-dui-xiang.md)
