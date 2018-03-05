@@ -1,3 +1,5 @@
+英文地址：[https://kubernetes.io/docs/concepts/](https://kubernetes.io/docs/concepts/)
+
 # 概念
 
 这一章节的内容可以帮助学习Kubernetes的组成部分以及Kubernetes中代表集群的所使用的概念，这些都可以帮助你对Kubernetes的工作原理有更深入的理解。
@@ -58,12 +60,6 @@ Kubernetes负责维护你期望的集群状态。当你和Kubernetes进行交互
 ### Kubernetes Nodes
 
 集群中的Nodes是指运行application或cloud workflows的机器（如VM，物理机等等）。kubernetes Master控制每一个节点，通常会很少直接与Nodes进行交互。
-
-
-
-
-
-
 
 
 
