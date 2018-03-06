@@ -133,7 +133,7 @@ node controller在节点生命中扮演着不同的角色。首先，当节点�
 * `--register-node`
   * 自动向API server注册。
 * `--register-with-taints`
-  * 注册时携带的taints（逗号分隔的`<key>=<value>:<effect>`)。当`register-node`为false时，该参数无效。
+  * 注册时携带的taints（逗号分隔的`<key>=<value>:<effect>`\)。当`register-node`为false时，该参数无效。
 * `--node-ip`
   * 节点的IP地址。
 * `--node-labels`
@@ -141,7 +141,7 @@ node controller在节点生命中扮演着不同的角色。首先，当节点�
 * `--node-status-update-frequency`
   * 定义kubelet向master发送节点状态的频率。 
 
-目前，任意一个kubelet都被授权可以创建/修改任意一个节点资源。但在实践中，它应当仅仅创建/修改自身。(未来，我们计划仅仅允许kubelet去修改自身节点资源)
+目前，任意一个kubelet都被授权可以创建/修改任意一个节点资源。但在实践中，它应当仅仅创建/修改自身。\(未来，我们计划仅仅允许kubelet去修改自身节点资源\)
 
 #### 手动管理节点
 
@@ -158,6 +158,7 @@ node controller在节点生命中扮演着不同的角色。首先，当节点�
 ```
 kubectl cordon $NODENAME
 ```
+
 要注意的是，DaemonSet controller创建的pods会绕过调度器，所以会忽略节点的不可调度属性。The assumption is that daemons belong on the machine even if it is being drained of applications in preparation for a reboot.
 
 ### Node capacity
@@ -166,7 +167,7 @@ kubectl cordon $NODENAME
 
 Kubernetes调度器会确保某节点上所有的pods可以拥有足够的资源。它会检查容器请求总和不会超过节点容量。它包括所有由kubelet启动的容器，但不会包括由Docker直接启动的容器或者非容器进程。
 
-如果你想显式地为非pod进行保留一些资源，你可以使用如下模板
+如果你想显式地为非pod进行保留一些资源，你可以使用如下模板  
 创建一个placeholder pod：
 
 ```
@@ -186,9 +187,9 @@ spec:
 
 设置你想保留的cpu和内存值。将该文件放置在清单目录（由kublet的`--config=DIR`参数指定）中。
 
+# API Object
 
-API Object
+---
 
-
-
+节点是Kubernetes REST API中的顶级资源。更多细节见：[Node API object](https://kubernetes.io/docs/api-reference/v1.9/#node-v1-core)。
 
