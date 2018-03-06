@@ -7,8 +7,8 @@
   * [Kubernetes API](chapter1/kubernetes-api.md)
   * [Kubernetes 中的对象](chapter1/kubernetes-zhong-de-dui-xiang.md)
     * [理解Kubernetes对象](chapter1/kubernetes-zhong-de-dui-xiang/li-jiekubernetes-dui-xiang.md)
-    * 命名空间NameSpaces
     * [命名Names](chapter1/kubernetes-zhong-de-dui-xiang/ming-ming-names.md)
+    * [命名空间NameSpaces](chapter1/kubernetes-zhong-de-dui-xiang/ming-ming-kong-jian-namespaces.md)
     * Labels和Selectors
     * Annotations
   * [使用kubectl进行对象管理](chapter1/shi-yong-kubectl-jin-xing-dui-xiang-guan-li.md)
