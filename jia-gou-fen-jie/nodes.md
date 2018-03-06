@@ -102,15 +102,17 @@ Kubernetes将会在内部创建一个节点对象， 并基于`metadata.name`字
 
 node controller是Kubernetes的master组件，它会从不同维度对节点进行管理。
 
-node controller在节点生命中拥有不同的角色。首先，当节点注册时，会分配一个CIDR block到节点（假如允许CIDR block分配）。
+node controller在节点生命中扮演着不同的角色。首先，当节点注册时，会分配一个CIDR block到节点（假如允许CIDR block分配）。
 
-第二个角色是
+其次是保持node controller内部的节点列表与云提供商提供的可用机器列表保持一致。当运行在云环境中时，一旦节点不健康，node controller将会向云提供商询问该节点的VM是否可用。如果不可用，则会将该节点从自身维护的节点列表中删除。
 
-The second is keeping the node controller’s internal list of nodes up to date with the cloud provider’s list of available machines. When running in a cloud environment, whenever a node is unhealthy, the node controller asks the cloud provider if the VM for that node is still available. If not, the node controller deletes the node from its list of nodes.
+第三种角色就是监控节点的健康。node controller负责在节点不可达（比如由于某种原因node controller无法接收到该节点的心跳，再比如节点宕机）时，将节点的status从ready更新为unknown，如果该节点持续不可达（默认的超时时间是40秒，超过该时间，就会报告unknown，并在5分钟后开始删除pod），则会将该节点上的pods删除（使用优雅的终止方式）。node controller会以`--node-monitor-period`秒的间隔检查每个节点的状态。
 
-The third is monitoring the nodes’ health. The node controller is responsible for updating the NodeReady condition of NodeStatus to ConditionUnknown when a node becomes unreachable \(i.e. the node controller stops receiving heartbeats for some reason, e.g. due to the node being down\), and then later evicting all the pods from the node \(using graceful termination\) if the node continues to be unreachable. \(The default timeouts are 40s to start reporting ConditionUnknown and 5m after that to start evicting pods.\) The node controller checks the state of each node every`--node-monitor-period`seconds.
+在Kubernetes 1.4版本中，我们
 
-In Kubernetes 1.4, we updated the logic of the node controller to better handle cases when a large number of nodes have problems with reaching the master \(e.g. because the master has networking problem\). Starting with 1.4, the node controller will look at the state of all nodes in the cluster when making a decision about pod eviction.
+
+
+, we updated the logic of the node controller to better handle cases when a large number of nodes have problems with reaching the master \(e.g. because the master has networking problem\). Starting with 1.4, the node controller will look at the state of all nodes in the cluster when making a decision about pod eviction.
 
 In most cases, node controller limits the eviction rate to`--node-eviction-rate`\(default 0.1\) per second, meaning it won’t evict pods from more than 1 node per 10 seconds.
 
@@ -129,33 +131,33 @@ When the kubelet flag`--register-node`is true \(the default\), the kubelet will 
 For self-registration, the kubelet is started with the following options:
 
 * `--kubeconfig`
-  - Path to credentials to authenticate itself to the apiserver.
+  * Path to credentials to authenticate itself to the apiserver.
 * `--cloud-provider`
-  - How to talk to a cloud provider to read metadata about itself.
+  * How to talk to a cloud provider to read metadata about itself.
 * `--register-node`
-  - Automatically register with the API server.
+  * Automatically register with the API server.
 * `--register-with-taints`
-  - Register the node with the given list of taints \(comma separated
-  `<`
-  `key`
-  `>`
-  `=`
-  `<`
-  `value`
-  `>`
-  `:`
-  `<`
-  `effect`
-  `>`
-  \). No-op if
-  `register-node`
-  is false.
+  * Register the node with the given list of taints \(comma separated
+    `<`
+    `key`
+    `>`
+    `=`
+    `<`
+    `value`
+    `>`
+    `:`
+    `<`
+    `effect`
+    `>`
+    \). No-op if
+    `register-node`
+    is false.
 * `--node-ip`
-  - IP address of the node.
+  * IP address of the node.
 * `--node-labels`
-  - Labels to add when registering the node in the cluster.
+  * Labels to add when registering the node in the cluster.
 * `--node-status-update-frequency`
-  - Specifies how often kubelet posts node status to master.
+  * Specifies how often kubelet posts node status to master.
 
 Currently, any kubelet is authorized to create/modify any node resource, but in practice it only creates/modifies its own. \(In the future, we plan to only allow a kubelet to modify its own node resource.\)
 
