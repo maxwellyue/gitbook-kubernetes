@@ -141,7 +141,7 @@ node controller在节点生命中扮演着不同的角色。首先，当节点�
 * `--node-status-update-frequency`
   * 定义kubelet向master发送节点状态的频率。 
 
-Currently, any kubelet is authorized to create/modify any node resource, but in practice it only creates/modifies its own. \(In the future, we plan to only allow a kubelet to modify its own node resource.\)
+目前，Currently, any kubelet is authorized to create/modify any node resource, but in practice it only creates/modifies its own. \(In the future, we plan to only allow a kubelet to modify its own node resource.\)
 
 #### Manual Node Administration {#manual-node-administration}
 
