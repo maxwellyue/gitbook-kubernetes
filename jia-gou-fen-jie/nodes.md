@@ -143,26 +143,24 @@ node controller在节点生命中扮演着不同的角色。首先，当节点�
 
 目前，任意一个kubelet都被授权可以创建/修改任意一个节点资源。但在实践中，它应当仅仅创建/修改自身。(未来，我们计划仅仅允许kubelet去修改自身节点资源)
 
-#### Manual Node Administration {#manual-node-administration}
+#### 手动管理节点
 
-A cluster administrator can create and modify node objects.
+集群的管理员可以创建和修改节点对象。
 
-If the administrator wishes to create node objects manually, set the kubelet flag`--register-node=false`.
+如果管理员想手动创建节点对象，需要将kubelet设置为`--register-node=false`。
 
-The administrator can modify node resources \(regardless of the setting of`--register-node`\). Modifications include setting labels on the node and marking it unschedulable.
+管理员可以修改节点资源（无论`--register-node`是true还是false）。修改操作包括为节点设置标签以及将其标记为不可调度。
 
-Labels on nodes can be used in conjunction with node selectors on pods to control scheduling, e.g. to constrain a pod to only be eligible to run on a subset of the nodes.
+节点上的标签可以与选择器一起来控制pods的调度，比如限制一个pod只可以在一个特定的节点集合中运行。
 
-Marking a node as unschedulable will prevent new pods from being scheduled to that node, but will not affect any existing pods on the node. This is useful as a preparatory step before a node reboot, etc. For example, to mark a node unschedulable, run this command:
+将节点标记为不可调度，则会组织新的pods调度到该节点，但不会影响已经在该节点运行的pods。这个功能可以用在节点重启的时候。比如，可以通过以下命令来禁止对该节点调度：
 
 ```
-kubectl cordon 
-$NODENAME
+kubectl cordon $NODENAME
 ```
+要注意的是，DaemonSet controller创建的pods会绕过调度器，所以会忽略节点的不可调度属性。The assumption is that daemons belong on the machine even if it is being drained of applications in preparation for a reboot.
 
-Note that pods which are created by a DaemonSet controller bypass the Kubernetes scheduler, and do not respect the unschedulable attribute on a node. The assumption is that daemons belong on the machine even if it is being drained of applications in preparation for a reboot.
-
-### Node capacity {#node-capacity}
+### Node capacity
 
 The capacity of the node \(number of cpus and amount of memory\) is part of the node object. Normally, nodes register themselves and report their capacity when creating the node object. If you are doing[manual node administration](https://kubernetes.io/docs/concepts/architecture/nodes/#manual-node-administration), then you need to set node capacity when adding a node.
 
