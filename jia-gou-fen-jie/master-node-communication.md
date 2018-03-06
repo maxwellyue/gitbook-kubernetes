@@ -44,5 +44,3 @@ The connections from the apiserver to a node, pod, or service default to plain H
 
 [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/)uses SSH tunnels to protect the Master -&gt; Cluster communication paths. In this configuration, the apiserver initiates an SSH tunnel to each node in the cluster \(connecting to the ssh server listening on port 22\) and passes all traffic destined for a kubelet, node, pod, or service through the tunnel. This tunnel ensures that the traffic is not exposed outside of the private GCE network in which the cluster is running.
 
-
-
