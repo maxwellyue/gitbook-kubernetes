@@ -162,9 +162,33 @@ kubectl cordon $NODENAME
 
 ### Node capacity
 
-The capacity of the node \(number of cpus and amount of memory\) is part of the node object. Normally, nodes register themselves and report their capacity when creating the node object. If you are doing[manual node administration](https://kubernetes.io/docs/concepts/architecture/nodes/#manual-node-administration), then you need to set node capacity when adding a node.
+节点的容量（如CPU数量、内存大小等）是节点对象的一部分。正常情况下，节点在注册它们自己并创建节点对象的时候，会报告自身的容量信息。如果你是手动进行节点管理，那么你需要在添加节点的时候设置节点容量。
 
-The Kubernetes scheduler ensures that there are enough resources for all the pods on a node. It checks that the sum of the requests of containers on the node is no greater than the node capacity. It includes all containers started by the kubelet, but not containers started directly by Docker nor processes not in containers.
+Kubernetes调度器会确保某节点上所有的pods可以拥有足够的资源。它会检查容器请求总和不会超过节点容量。它包括所有由kubelet启动的容器，但不会包括由Docker直接启动的容器或者非容器进程。
 
-If you want to explicitly reserve resources for non-pod processes, you can create a placeholder pod. Use the following template:
+如果你想显式地为非pod进行保留一些资源，你可以使用如下模板
+创建一个placeholder pod：
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource-reserver
+spec:
+  containers:
+  - name: sleep-forever
+    image: k8s.gcr.io/pause:0.8.0
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+```
+
+设置你想保留的cpu和内存值。将该文件放置在清单目录（由kublet的`--config=DIR`参数指定）中。
+
+
+API Object
+
+
+
 
