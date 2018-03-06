@@ -112,21 +112,19 @@ node controller在节点生命中扮演着不同的角色。首先，当节点�
 
 在大多数情况下，node controller将eviction rate限制在每秒`--node-eviction-rate`\(默认 0.1\) ，这意味着，它不会以超过每10秒一个节点的速率从节点中evict pods 。
 
-节点的eviction行为在一个给定的可用的zone变得不健康时会发生改变。
+当一个给定的可用的zone变得不健康时，节点的eviction行为会发生改变。node controller会检查不健康（节点condition中ready的值为false或unknown）的nodes在该zone中所占的百分比。如果这个比例达到了`--unhealthy-zone-threshold`\(默认 0.55\)，那么eviction rate 就会减小；如果这个集群很小（比如小于或等于`--large-cluster-size-threshold`个节点 ，默认50\)，那么就会停止 evictions ,，否则eviction rate就会持续减小到 `--secondary-node-eviction-rate`\(默认0.01\) 每秒。可用zone之所以实现这些规则，是因为一个可用zone可能与master断开，但此时其他zones仍然保持连接。如果你的集群没有跨越多个云提供商可用性区域，那么就仅仅存在一个可用zone（整个集群）。
 
-The node eviction behavior changes when a node in a given availability zone becomes unhealthy. The node controller checks what percentage of nodes in the zone are unhealthy \(NodeReady condition is ConditionUnknown or ConditionFalse\) at the same time. If the fraction of unhealthy nodes is at least`--unhealthy-zone-threshold`\(default 0.55\) then the eviction rate is reduced: if the cluster is small \(i.e. has less than or equal to`--large-cluster-size-threshold`nodes - default 50\) then evictions are stopped, otherwise the eviction rate is reduced to`--secondary-node-eviction-rate`\(default 0.01\) per second. The reason these policies are implemented per availability zone is because one availability zone might become partitioned from the master while the others remain connected. If your cluster does not span multiple cloud provider availability zones, then there is only one availability zone \(the whole cluster\).
+将你的节点分布到不同的zones中的一个主要原因是，你的工作负载可以在一个zone不可用时，将其迁移到另一个可用zone中。因此，如果一个zone中的所有节点都不健康（例如集群中不存在健康节点了），node controller 就会以`--node-eviction-rate`的正常速率进行evicts。在这种情况下，node controller 会认为master的连通性出现了问题，就会停止所有的evictions，直到恢复了一些连接。
 
-A key reason for spreading your nodes across availability zones is so that the workload can be shifted to healthy zones when one entire zone goes down. Therefore, if all nodes in a zone are unhealthy then node controller evicts at the normal rate`--node-eviction-rate`. The corner case is when all zones are completely unhealthy \(i.e. there are no healthy nodes in the cluster\). In such case, the node controller assumes that there’s some problem with master connectivity and stops all evictions until some connectivity is restored.
+从Kubernetes 1.6开始，node controller 也会对那些运行在出现`NoExecute`污点，但却不容忍任何污点的pods进行evicting。此外，作为alpha特性，该功能是默认关闭的，node controller还负责对出现问题（如不可达或not ready）的结点进行添加污点。更多该alpha特性的细节见[this documentation](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)。
 
-Starting in Kubernetes 1.6, the NodeController is also responsible for evicting pods that are running on nodes with`NoExecute`taints, when the pods do not tolerate the taints. Additionally, as an alpha feature that is disabled by default, the NodeController is responsible for adding taints corresponding to node problems like node unreachable or not ready. See[this documentation](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)for details about`NoExecute`taints and the alpha feature.
-
-Starting in version 1.8, the node controller can be made responsible for creating taints that represent Node conditions. This is an alpha feature of version 1.8.
+从Kubernetes 1.8开始，node controller可以创建污点来表示结点的conditions。这是1.8版本的alpha特性。
 
 ### Self-Registration of Nodes {#self-registration-of-nodes}
 
-When the kubelet flag`--register-node`is true \(the default\), the kubelet will attempt to register itself with the API server. This is the preferred pattern, used by most distros.
+当kubelet的`--register-node`标志为true \(默认值\)的时候，kubelet 会尝试将自身节点（运行该kubelet的节点）注册到API server上。这是大多数发行版使用的首选模式。
 
-For self-registration, the kubelet is started with the following options:
+对于自注册功能，kubelet会附带以下可选参数启动：
 
 * `--kubeconfig`
   * Path to credentials to authenticate itself to the apiserver.
