@@ -4,7 +4,7 @@
 * [Kubernetes概述](chapter1.md)
   * [Kubernetes是什么](chapter1/kubernetesshi-shi-yao.md)
   * [Kubernetes组件](chapter1/kuberneteszu-jian.md)
-  * Kubernetes API
+  * [Kubernetes API](chapter1/kubernetes-api.md)
   * [Kubernetes 中的对象](chapter1/kubernetes-zhong-de-dui-xiang.md)
     * [理解Kubernetes对象](chapter1/kubernetes-zhong-de-dui-xiang/li-jiekubernetes-dui-xiang.md)
     * 命名空间NameSpaces
