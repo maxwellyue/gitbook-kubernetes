@@ -13,9 +13,9 @@
     * [Annotations](chapter1/kubernetes-zhong-de-dui-xiang/annotations.md)
   * [使用kubectl进行对象管理](chapter1/shi-yong-kubectl-jin-xing-dui-xiang-guan-li.md)
     * [Kubernetes对象管理](chapter1/shi-yong-kubectl-jin-xing-dui-xiang-guan-li/kubernetesdui-xiang-guan-li.md)
-    * 使用命令行管理Kubernetes对象
-    * 使用配置文件管理Kubernetes对象
-    * 使用配置文件对Kubernetes对象进行声明式管理
+    * [使用Imperative Commands管理Kubernetes对象](chapter1/shi-yong-kubectl-jin-xing-dui-xiang-guan-li/shi-yong-ming-ling-xing-guan-li-kubernetes-dui-xiang.md)
+    * [使用Imperative object configuration管理Kubernetes对象](chapter1/shi-yong-kubectl-jin-xing-dui-xiang-guan-li/shi-yong-pei-zhi-wen-jian-guan-li-kubernetes-dui-xiang.md)
+    * [使用Declarative object configuration管理Kubernetes对象](chapter1/shi-yong-kubectl-jin-xing-dui-xiang-guan-li/shi-yong-pei-zhi-wen-jian-dui-kubernetes-dui-xiang-jin-xing-sheng-ming-shi-guan-li.md)
 * [Kubernetes架构](jia-gou-fen-jie.md)
 * [扩展Kubernetes](kuo-zhankubernetes.md)
 * [实践](shi-jian.md)
