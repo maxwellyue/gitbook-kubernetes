@@ -25,19 +25,17 @@
 
 * Fields managed by a declarative configuration layer. Attaching these fields as annotations distinguishes them from default values set by clients or servers, and from auto-generated fields and fields set by auto-sizing or auto-scaling systems.
 
-* Build, release, or image information like timestamps, release IDs, git branch, PR numbers, image hashes, and registry address.
+* 构建、发布或镜像的信息，如时间戳，发行ID，git分支，PR编号，镜像hashes和Registry地址等。
 
 * Pointers to logging, monitoring, analytics, or audit repositories.
 
-* Client library or tool information that can be used for debugging purposes: for example, name, version, and build information.
+* 用来debug的客户依赖库或工具的信息，比如名称、 版本和构建信息。
 
 * User or tool/system provenance information, such as URLs of related objects from other ecosystem components.
 
-* Lightweight rollout tool metadata: for example, config or checkpoints.
+* 轻量级回滚工具的元数据，比如配置或检查点。
 
-* Phone or pager numbers of persons responsible, or directory entries that specify where that information can be found, such as a team web site.
+* 对该对象负责的人员的手机电话/寻呼机号码或者可以找到此类信息的地址信息，比如团队的web站点。
 
 你也可以不使用annotations，而将这种类型的数据存储在外部数据库或目录中。但是这么做的话，会使得生成用于部署，管理，反思等的共享客户端库和工具变得困难。
-
-
 
