@@ -10,7 +10,7 @@
     * [命名Names](chapter1/kubernetes-zhong-de-dui-xiang/ming-ming-names.md)
     * [命名空间NameSpaces](chapter1/kubernetes-zhong-de-dui-xiang/ming-ming-kong-jian-namespaces.md)
     * [Labels和Selectors](chapter1/kubernetes-zhong-de-dui-xiang/labelshe-selectors.md)
-    * Annotations
+    * [Annotations](chapter1/kubernetes-zhong-de-dui-xiang/annotations.md)
   * [使用kubectl进行对象管理](chapter1/shi-yong-kubectl-jin-xing-dui-xiang-guan-li.md)
     * [Kubernetes对象管理](chapter1/shi-yong-kubectl-jin-xing-dui-xiang-guan-li/kubernetesdui-xiang-guan-li.md)
     * 使用命令行管理Kubernetes对象
