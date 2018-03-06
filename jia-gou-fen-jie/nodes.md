@@ -57,9 +57,7 @@ Deprecated: node phase is no longer used.
 
 在Kubernetes1.5之前的版本，node controller 会从apiserver中强制删除这些不可达的pods。但是，1.5及更高的版本中，node controller不会强制删除这些pods，直到它确认这些pods已经从集群中真正地停止运行。可以将这些在可能在不可达节点上运行的pods的状态看成是“Terminating” 或者 “Unknown”。当Kubernetes无法推断一个结点是否从集群中永久离开时，集群管理员可能需要手动删除该节点对象。从kubernetes删除节点对象会导致运行在该节点的Pod对象从apiserver中删除，并释放它们的名字。
 
-1.8版本引入了一个alpha的特性：自动创建污点（[taints](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)）来表示conditions。可以通过给apiserver、controller manager和scheduler设置如下标识来开启该功能：`--feature-gates=...,TaintNodesByCondition=true`
-
-当`TaintNodesByCondition`设为true，scheduler就会忽略节点的 conditions，取而代之的是，它会查看节点的污点以及pods的tolerations。
+1.8版本引入了一个alpha的特性：自动创建污点（[taints](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)）来表示conditions。可以通过给apiserver、controller manager和scheduler设置如下标识来开启该功能：`--feature-gates=...,TaintNodesByCondition=true`。当`TaintNodesByCondition`设为true，scheduler就会忽略节点的 conditions，取而代之的是，它会查看节点的污点以及pods的tolerations。
 
 现在，用户可以在这两种新旧调度模型之间进行选择。没有任何tolerations的Pod将会按照旧的模式进行调度，而可以容忍特定节点污点的pod则可以调度在该节点上。
 
