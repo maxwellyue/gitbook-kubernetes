@@ -127,33 +127,19 @@ node controller在节点生命中扮演着不同的角色。首先，当节点�
 对于自注册功能，kubelet会附带以下可选参数启动：
 
 * `--kubeconfig`
-  * Path to credentials to authenticate itself to the apiserver.
+  * 向apiserver进行身份认证时的使用的凭证的路径。
 * `--cloud-provider`
-  * How to talk to a cloud provider to read metadata about itself.
+  * 读取自身元数据时如何与云提供商进行交互。
 * `--register-node`
-  * Automatically register with the API server.
+  * 自动向API server注册。
 * `--register-with-taints`
-  * Register the node with the given list of taints \(comma separated
-    `<`
-    `key`
-    `>`
-    `=`
-    `<`
-    `value`
-    `>`
-    `:`
-    `<`
-    `effect`
-    `>`
-    \). No-op if
-    `register-node`
-    is false.
+  * 注册时携带的taints（逗号分隔的`<key>=<value>:<effect>`)。当`register-node`为false时，该参数无效。
 * `--node-ip`
-  * IP address of the node.
+  * 节点的IP地址。
 * `--node-labels`
-  * Labels to add when registering the node in the cluster.
+  * 注册时携带的标签。
 * `--node-status-update-frequency`
-  * Specifies how often kubelet posts node status to master.
+  * 定义kubelet向master发送节点状态的频率。 
 
 Currently, any kubelet is authorized to create/modify any node resource, but in practice it only creates/modifies its own. \(In the future, we plan to only allow a kubelet to modify its own node resource.\)
 
