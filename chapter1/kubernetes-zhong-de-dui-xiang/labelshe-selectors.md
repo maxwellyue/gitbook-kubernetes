@@ -137,17 +137,41 @@ LIST和WATCH操作，可以使用query参数来指定label选择器来过滤返�
 
 一个service所对应的pods集合是通过标签选择器来定义的。类似地，一个ReplicationController所管理的pods集合也是通过标签选择器来定义的。
 
+这两个对象所使用的标签选择器使用maps的方式被定义在json或yaml文件中，并且**只支持相等条件**的选择器，比如
 
+```
+"selector":{
+    "component":"redis",
+}
+```
 
+或者
 
+```
+selector:
+    component: redis
+```
 
+上面定义的选择器的条件是：`component=redis`或者`component in (redis)`。
 
+### 支持集合条件的资源
 
+比较新的资源（即Kubernetes中较高版本中出现的），如[`Job`](https://kubernetes.io/docs/concepts/jobs/run-to-completion-finite-workloads/)，[`Deployment`](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)，[`Replica Set`](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/)，和[`Daemon Set`](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)，都同时支持集合条件。
 
+```
+selector:
+  matchLabels:
+    component: redis
+  matchExpressions:
+    - {key: tier, operator: In, values: [cache]}
+    - {key: environment, operator: NotIn, values: [dev]}
+```
 
+matchLabels是一个键值对的map。一个单独的 {key,value} 相当于 matchExpressions 的一个元素，它的键字段是”key”,操作符是 In ，并且值数组值包含”value”。 matchExpressions 是一个pod的选择器条件的列表。合法的操作符包含In, NotIn, Exists, 和 DoesNotExist。在In和NotIn的情况下，值的组必须不能为空。所有的条件，包含 matchLabels 和matchExpressions 中的，会用AND符号连接，他们必须都被满足以完成匹配。
 
+#### Selecting sets of nodes {#selecting-sets-of-nodes}
 
-
+还有一种用例是：在调度pod到node时，使用选择器来限制nodes。见[node selection](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)。
 
 
 
