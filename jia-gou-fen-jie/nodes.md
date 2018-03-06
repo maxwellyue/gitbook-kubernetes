@@ -106,15 +106,13 @@ node controller在节点生命中扮演着不同的角色。首先，当节点�
 
 其次是保持node controller内部的节点列表与云提供商提供的可用机器列表保持一致。当运行在云环境中时，一旦节点不健康，node controller将会向云提供商询问该节点的VM是否可用。如果不可用，则会将该节点从自身维护的节点列表中删除。
 
-第三种角色就是监控节点的健康。node controller负责在节点不可达（比如由于某种原因node controller无法接收到该节点的心跳，再比如节点宕机）时，将节点的status从ready更新为unknown，如果该节点持续不可达（默认的超时时间是40秒，超过该时间，就会报告unknown，并在5分钟后开始删除pod），则会将该节点上的pods删除（使用优雅的终止方式）。node controller会以`--node-monitor-period`秒的间隔检查每个节点的状态。
+第三种角色就是监控节点的健康。node controller负责在节点不可达（比如由于某种原因node controller无法接收到该节点的心跳，再比如节点宕机）时，将节点的status从ready更新为unknown，如果该节点持续不可达（默认的超时时间是40秒，超过该时间，就会报告unknown，并在5分钟后开始evict pod），则会将该节点上的pods删除（使用优雅的终止方式）。node controller会以`--node-monitor-period`秒的间隔检查每个节点的状态。
 
-在Kubernetes 1.4版本中，我们
+在Kubernetes 1.4版本中，我们对node controller的逻辑进行了升级，以便可以更好地处理当大量节点不可达master的情况（比如，master出现了网络问题）。从Kubernetes 1.4版本开始，node controller在做出evict pod的决定时会检查所有节点的状态。
 
+在大多数情况下，node controller将eviction rate限制在每秒`--node-eviction-rate`\(默认 0.1\) ，这意味着，它不会以超过每10秒一个节点的速率从节点中evict pods 。
 
-
-, we updated the logic of the node controller to better handle cases when a large number of nodes have problems with reaching the master \(e.g. because the master has networking problem\). Starting with 1.4, the node controller will look at the state of all nodes in the cluster when making a decision about pod eviction.
-
-In most cases, node controller limits the eviction rate to`--node-eviction-rate`\(default 0.1\) per second, meaning it won’t evict pods from more than 1 node per 10 seconds.
+节点的eviction行为在一个给定的可用的zone变得不健康时会发生改变。
 
 The node eviction behavior changes when a node in a given availability zone becomes unhealthy. The node controller checks what percentage of nodes in the zone are unhealthy \(NodeReady condition is ConditionUnknown or ConditionFalse\) at the same time. If the fraction of unhealthy nodes is at least`--unhealthy-zone-threshold`\(default 0.55\) then the eviction rate is reduced: if the cluster is small \(i.e. has less than or equal to`--large-cluster-size-threshold`nodes - default 50\) then evictions are stopped, otherwise the eviction rate is reduced to`--secondary-node-eviction-rate`\(default 0.01\) per second. The reason these policies are implemented per availability zone is because one availability zone might become partitioned from the master while the others remain connected. If your cluster does not span multiple cloud provider availability zones, then there is only one availability zone \(the whole cluster\).
 
