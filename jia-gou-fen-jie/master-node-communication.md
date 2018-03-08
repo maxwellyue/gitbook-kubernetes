@@ -40,17 +40,15 @@ master的其他组件也通过安全端口与集群的apiserver进行通信。
 
 如果不能使用这种方式，并且需要避免通过不可信或公共网络连接，那么可以在apiserver和kubelet之间来使用SSH隧道的方式。
 
-If that is not possible, use[SSH tunneling](https://kubernetes.io/docs/concepts/architecture/master-node-communication/#ssh-tunnels)between the apiserver and kubelet if required to avoid connecting over an untrusted or public network.
-
-Finally,[Kubelet authentication and/or authorization](https://kubernetes.io/docs/admin/kubelet-authentication-authorization/)should be enabled to secure the kubelet API.
+最后，应该开启[Kubelet authentication and/or authorization](https://kubernetes.io/docs/admin/kubelet-authentication-authorization/)来确保kubelet API的安全。
 
 ### apiserver -&gt; nodes, pods, and services {#apiserver---nodes-pods-and-services}
 
-The connections from the apiserver to a node, pod, or service default to plain HTTP connections and are therefore neither authenticated nor encrypted. They can be run over a secure HTTPS connection by prefixing`https:`to the node, pod, or service name in the API URL, but they will not validate the certificate provided by the HTTPS endpoint nor provide client credentials so while the connection will be encrypted, it will not provide any guarantees of integrity. These connections**are not currently safe**to run over untrusted and/or public networks.
+从apiserver到node，pod或者 service的连接默认是普通的HTTP连接，因此这种连接没有经过认证也没有经过加密。这些连接可以通过在在API URL前面添加`https:`使用安全的HTTPS的方式进行，但是即使这些连接经过了加密，但是不会去校验HPPTS终端所提供的证书，也不会提供客户端证书，因此它不会对连接的正确性（integrity）提供任何保证。目前，这些连接在不受信任或公共网络中的运行是不安全的。
 
 ### SSH Tunnels {#ssh-tunnels}
 
 ---
 
-[Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/)uses SSH tunnels to protect the Master -&gt; Cluster communication paths. In this configuration, the apiserver initiates an SSH tunnel to each node in the cluster \(connecting to the ssh server listening on port 22\) and passes all traffic destined for a kubelet, node, pod, or service through the tunnel. This tunnel ensures that the traffic is not exposed outside of the private GCE network in which the cluster is running.
+[Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) 使用 SSH 隧道来保护Master到 集群的通信路径。在这种配置方式下，apiserver会与节点中的所有节点分别初始化一个SSH隧道，并通过该隧道来向kubelet、node、 pod 或者 service 来传输数据。这种隧道会确保数据不会暴露到保证运行着集群的私有GCE网络中。
 
