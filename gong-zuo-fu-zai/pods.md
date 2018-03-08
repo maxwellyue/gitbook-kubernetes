@@ -12,17 +12,19 @@ Pod中包含了应用容器的封装（或者，在某些情况下，多种容�
 
 kubernetes集群中，Pods主要用在两个方面：
 
-* 运行单一容器  
+* 运行单一容器
 
- “一容器一Pod”的模型在Kubernetes中是最常见的。此时，你可以将Pod看成是单一容器的包装，Kubernetes对Pods进行管理，而不会直接管理容器。
+  “一容器一Pod”的模型在Kubernetes中是最常见的。此时，你可以将Pod看成是单一容器的包装，Kubernetes对Pods进行管理，而不会直接管理容器。
 
 * 运行需要工作在一起的多个容器
+
+一个Pod中可能会包含一个由多个
 
 Pods in a Kubernetes cluster can be used in two main ways:
 
 * **Pods that run a single container**
   . The “one-container-per-Pod” model is the most common Kubernetes use case; in this case, you can think of a Pod as a wrapper around a single container, and Kubernetes manages the Pods rather than the containers directly.
-* **Pods that run multiple containers that need to work together**
+* **Pods that run multiple containers that need to wor**
   . A Pod might encapsulate an application composed of multiple co-located containers that are tightly coupled and need to share resources. These co-located containers might form a single cohesive unit of service–one container serving files from a shared volume to the public, while a separate “sidecar” container refreshes or updates those files. The Pod wraps these containers and storage resources together as a single manageable entity.
 
 The[Kubernetes Blog](http://blog.kubernetes.io/)has some additional information on Pod use cases. For more information, see:
