@@ -4,15 +4,13 @@
 
 ---
 
-Pod
+Pod是Kubernetes的\]基础构件，是你在Kubernetes对象模型中所能创建或部署的最小、最简单的单元。一个Pod表示集群中运行的一个程序。
+
+Pod中包含了应用容器的封装（或者，在某些情况下，多种容器）、存储资源、唯一的网络IP和控制容器运行的选项。一个Pod表示了一个部署单元：Kubernetes中单一的应用实例，其中可能包含一个或多个仅仅耦合并共享资源的容器。
+
+> [Docker](https://www.docker.com/) 是Kubernetes Pod中最常见的容器运行时，但是Pods也支持其他容器运行时。
 
 
-
-A\_Pod\_is the basic building block of Kubernetes–the smallest and simplest unit in the Kubernetes object model that you create or deploy. A Pod represents a running process on your cluster.
-
-A Pod encapsulates an application container \(or, in some cases, multiple containers\), storage resources, a unique network IP, and options that govern how the container\(s\) should run. A Pod represents a unit of deployment:_a single instance of an application in Kubernetes_, which might consist of either a single container or a small number of containers that are tightly coupled and that share resources.
-
-> [Docker](https://www.docker.com/)is the most common container runtime used in a Kubernetes Pod, but Pods support other container runtimes as well.
 
 Pods in a Kubernetes cluster can be used in two main ways:
 
