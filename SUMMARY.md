@@ -19,7 +19,7 @@
 * [Kubernetes架构](jia-gou-fen-jie.md)
   * [节点Nodes](jia-gou-fen-jie/nodes.md)
   * [Master节点通信](jia-gou-fen-jie/master-node-communication.md)
-  * Concepts Underlying the Cloud Controller Manager
+  * [Concepts Underlying the Cloud Controller Manager](jia-gou-fen-jie/concepts-underlying-the-cloud-controller-manager.md)
 * [扩展Kubernetes](kuo-zhankubernetes.md)
 * [实践](shi-jian.md)
 * 容器
