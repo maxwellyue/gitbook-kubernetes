@@ -34,11 +34,11 @@ master的其他组件也通过安全端口与集群的apiserver进行通信。
 * 为运行中的Pods设置一些额外信息（通过kubectl）
 * 让kubelet’s拥有端口转发功能
 
+这些连接最终到达kubelet终端。默认情况下，apiserver不会验证kubelet的服务证书，这会导致连接可能会遭受中间人攻击，并使在不受信任或公共网络运行时不安全。
 
+如果想要验证这种连接，可以使用`--kubelet-certificate-authority`标识附带根证书，以此让apiserver来验证kubelet的服务证书。
 
-These connections terminate at the kubelet’s HTTPS endpoint. By default, the apiserver does not verify the kubelet’s serving certificate, which makes the connection subject to man-in-the-middle attacks, and**unsafe**to run over untrusted and/or public networks.
-
-To verify this connection, use the`--kubelet-certificate-authority`flag to provide the apiserver with a root certificate bundle to use to verify the kubelet’s serving certificate.
+如果不能使用这种方式，并且需要避免通过不可信或公共网络连接，那么可以在apiserver和kubelet之间来使用SSH隧道的方式。
 
 If that is not possible, use[SSH tunneling](https://kubernetes.io/docs/concepts/architecture/master-node-communication/#ssh-tunnels)between the apiserver and kubelet if required to avoid connecting over an untrusted or public network.
 
