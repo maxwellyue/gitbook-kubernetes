@@ -21,11 +21,14 @@
   * [Master节点通信](jia-gou-fen-jie/master-node-communication.md)
   * [Concepts Underlying the Cloud Controller Manager](jia-gou-fen-jie/concepts-underlying-the-cloud-controller-manager.md)
 * [扩展Kubernetes](kuo-zhankubernetes.md)
-* [实践](shi-jian.md)
 * 容器
-* 工作负载
-* 配置
+* [工作负载](gong-zuo-fu-zai.md)
+  * [Pods](gong-zuo-fu-zai/pods.md)
+  * [Controllers](gong-zuo-fu-zai/controllers.md)
+* [配置](pei-zhi.md)
+  * [Configuration最佳实践](pei-zhi/configurationzui-jia-shi-jian.md)
 * 服务、负载均衡和网络
 * 存储
 * 集群管理
+* [实践](shi-jian.md)
 
