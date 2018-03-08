@@ -32,10 +32,9 @@ master的其他组件也通过安全端口与集群的apiserver进行通信。
 
 * 获取Pods的日志
 * 为运行中的Pods设置一些额外信息（通过kubectl）
-* 
-* Fetching logs for pods.
-* Attaching \(through kubectl\) to running pods.
-* Providing the kubelet’s port-forwarding functionality.
+* 让kubelet’s拥有端口转发功能
+
+
 
 These connections terminate at the kubelet’s HTTPS endpoint. By default, the apiserver does not verify the kubelet’s serving certificate, which makes the connection subject to man-in-the-middle attacks, and**unsafe**to run over untrusted and/or public networks.
 
