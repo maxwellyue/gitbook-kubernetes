@@ -4,11 +4,11 @@
 
 ---
 
+Pod
 
 
 
-
-A_Pod_is the basic building block of Kubernetes–the smallest and simplest unit in the Kubernetes object model that you create or deploy. A Pod represents a running process on your cluster.
+A\_Pod\_is the basic building block of Kubernetes–the smallest and simplest unit in the Kubernetes object model that you create or deploy. A Pod represents a running process on your cluster.
 
 A Pod encapsulates an application container \(or, in some cases, multiple containers\), storage resources, a unique network IP, and options that govern how the container\(s\) should run. A Pod represents a unit of deployment:_a single instance of an application in Kubernetes_, which might consist of either a single container or a small number of containers that are tightly coupled and that share resources.
 
@@ -36,11 +36,11 @@ Note that grouping multiple co-located and co-managed containers in a single Pod
 
 ![](https://d33wubrfki0l68.cloudfront.net/aecab1f649bc640ebef1f05581bfcc91a48038c4/728d6/images/docs/pod.svg "pod diagram")
 
-Pods provide two kinds of shared resources for their constituent containers:_networking_and_storage_.
+Pods provide two kinds of shared resources for their constituent containers:_networking\_and\_storage_.
 
 #### Networking {#networking}
 
-Each Pod is assigned a unique IP address. Every container in a Pod shares the network namespace, including the IP address and network ports. Containers_inside a Pod_can communicate with one another using`localhost`. When containers in a Pod communicate with entities_outside the Pod_, they must coordinate how they use the shared network resources \(such as ports\).
+Each Pod is assigned a unique IP address. Every container in a Pod shares the network namespace, including the IP address and network ports. Containers_inside a Pod\_can communicate with one another using_`localhost`_. When containers in a Pod communicate with entities\_outside the Pod_, they must coordinate how they use the shared network resources \(such as ports\).
 
 #### Storage {#storage}
 
@@ -48,7 +48,7 @@ A Pod can specify a set of shared storage_volumes_. All containers in the Pod ca
 
 ## Working with Pods {#working-with-pods}
 
-You’ll rarely create individual Pods directly in Kubernetes–even singleton Pods. This is because Pods are designed as relatively ephemeral, disposable entities. When a Pod gets created \(directly by you, or indirectly by a Controller\), it is scheduled to run on a Node in your cluster. The Pod remains on that Node until the process is terminated, the pod object is deleted, the pod is_evicted_for lack of resources, or the Node fails.
+You’ll rarely create individual Pods directly in Kubernetes–even singleton Pods. This is because Pods are designed as relatively ephemeral, disposable entities. When a Pod gets created \(directly by you, or indirectly by a Controller\), it is scheduled to run on a Node in your cluster. The Pod remains on that Node until the process is terminated, the pod object is deleted, the pod is\_evicted\_for lack of resources, or the Node fails.
 
 **Note:**Restarting a container in a Pod should not be confused with restarting the Pod. The Pod itself does not run, but is an environment the containers run in and persists until it is deleted.
 
