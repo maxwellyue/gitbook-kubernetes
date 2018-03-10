@@ -18,20 +18,16 @@ kubernetes集群中，Pods主要用在两个方面：
 
 * 运行需要工作在一起的多个容器
 
-一个Pod中也可以包含一个由多个需要紧密耦合、共享资源的co-located的容器组成。这些co-located的容器
+一个Pod中也可以包含一个由多个需要紧密耦合、共享资源的co-located的容器组成。这些co-located的容器可能会形成一个统一的服务单元--一个容器负责从共享卷中向外提供文件服务，而另一个独立的“sidecar”容器负责刷新或更新这些文件。Pod会将这些容器和存储资源封装成为一个单一的可管理实体。
 
-
-
-* These co-located containers might form a single cohesive unit of service–one container serving files from a shared volume to the public, while a separate “sidecar” container refreshes or updates those files. The Pod wraps these containers and storage resources together as a single manageable entity.
-
-The[Kubernetes Blog](http://blog.kubernetes.io/)has some additional information on Pod use cases. For more information, see:
+[Kubernetes Blog](http://blog.kubernetes.io/) 有更多关于Pod使用的信息，见：
 
 * [The Distributed System Toolkit: Patterns for Composite Containers](http://blog.kubernetes.io/2015/06/the-distributed-system-toolkit-patterns.html)
 * [Container Design Patterns](http://blog.kubernetes.io/2016/06/container-design-patterns.html)
 
-Each Pod is meant to run a single instance of a given application. If you want to scale your application horizontally \(e.g., run multiple instances\), you should use multiple Pods, one for each instance. In Kubernetes, this is generally referred to as_replication_. Replicated Pods are usually created and managed as a group by an abstraction called a Controller. See[Pods and Controllers](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/#pods-and-controllers)for more information.
+每一个Pod意味着运行一个给定的应用的实例。如果你想水平伸缩你的应用（比如，运行多个实例），你应该使用多个Pod，每一个实例对应一个Pod。在Kubernetes中，这些实例被简称为副本（_replication_）。这些被复制的Pods通常被一个叫做Controller的抽象概念进行当做一个分组来创建和管理。更多信息见[Pods and Controllers](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/#pods-and-controllers)。
 
-### How Pods manage multiple Containers {#how-pods-manage-multiple-containers}
+### Pods如何管理多个容器 {#how-pods-manage-multiple-containers}
 
 Pods are designed to support multiple cooperating processes \(as containers\) that form a cohesive unit of service. The containers in a Pod are automatically co-located and co-scheduled on the same physical or virtual machine in the cluster. The containers can share resources and dependencies, communicate with one another, and coordinate when and how they are terminated.
 
