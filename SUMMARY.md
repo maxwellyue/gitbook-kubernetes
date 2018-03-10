@@ -30,6 +30,14 @@
     * Pods Preset
     * Disruptions
   * [Controllers](gong-zuo-fu-zai/controllers.md)
+    * ReplicaSet
+    * ReplicationConroller
+    * Deployments
+    * StatefulSets
+    * DaemonSet
+    * Garbage Collection
+    * Jobs-Run to Completion
+    * CronJob
 * [配置](pei-zhi.md)
   * [Configuration最佳实践](pei-zhi/configurationzui-jia-shi-jian.md)
 * 服务、负载均衡和网络
