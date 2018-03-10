@@ -29,43 +29,70 @@ kubernetes集群中，Pods主要用在两个方面：
 
 ### Pods如何管理多个容器 {#how-pods-manage-multiple-containers}
 
-Pods are designed to support multiple cooperating processes \(as containers\) that form a cohesive unit of service. The containers in a Pod are automatically co-located and co-scheduled on the same physical or virtual machine in the cluster. The containers can share resources and dependencies, communicate with one another, and coordinate when and how they are terminated.
+Pods被设计成支持多个共生的进程（即容器），并将这些进程当做一个服务单元。Pods中的容器会一起被自动调度到集群中的同一物理机或虚拟机上。这些容器会共享资源和依赖，相互通信，并在何时和如何终止这一点上进行协调。
 
-Note that grouping multiple co-located and co-managed containers in a single Pod is a relatively advanced use case. You should use this pattern only in specific instances in which your containers are tightly coupled. For example, you might have a container that acts as a web server for files in a shared volume, and a separate “sidecar” container that updates those files from a remote source, as in the following diagram:
+注意，在一个Pod中运行多个共生的容器是相对高级的用例。你仅仅需要在你的容器是仅仅耦合的情况下才需要使用这种方式。比如，你可能有一个容器来充当web文件服务器，而另一个“sidecar”容器负责更新这些文件，如下图所示：
 
-![](https://d33wubrfki0l68.cloudfront.net/aecab1f649bc640ebef1f05581bfcc91a48038c4/728d6/images/docs/pod.svg "pod diagram")
+插图：
 
-Pods provide two kinds of shared resources for their constituent containers:_networking\_and\_storage_.
+#### 网络
 
-#### Networking {#networking}
+Pods为这些容器提供两种共享的资源：网络和存储。这些同一Pod中的容器之间可以使用`localhost`进行这种方式进行通信。当这些容器需要与外部的其他Pods进行通信时，它们必须在如何使用网络资源上进行协调。
 
-Each Pod is assigned a unique IP address. Every container in a Pod shares the network namespace, including the IP address and network ports. Containers_inside a Pod\_can communicate with one another using_`localhost`_. When containers in a Pod communicate with entities\_outside the Pod_, they must coordinate how they use the shared network resources \(such as ports\).
+#### 存储 {#storage}
 
-#### Storage {#storage}
-
-A Pod can specify a set of shared storage_volumes_. All containers in the Pod can access the shared volumes, allowing those containers to share data. Volumes also allow persistent data in a Pod to survive in case one of the containers within needs to be restarted. See[Volumes](https://kubernetes.io/docs/concepts/storage/volumes/)for more information on how Kubernetes implements shared storage in a Pod.
+一个Pod可以定义一个共享存储卷集。该Pod中的所有容器都可以访问这些共享卷，这样容器之间就可以共享数据。Volumes也可以用来持久化Pod中的数据，以便其中的容器重启后可继续使用。Kubernetes如何在Pod中实现共享存储的内容见[Volumes](https://kubernetes.io/docs/concepts/storage/volumes/)。
 
 ## Working with Pods {#working-with-pods}
 
-You’ll rarely create individual Pods directly in Kubernetes–even singleton Pods. This is because Pods are designed as relatively ephemeral, disposable entities. When a Pod gets created \(directly by you, or indirectly by a Controller\), it is scheduled to run on a Node in your cluster. The Pod remains on that Node until the process is terminated, the pod object is deleted, the pod is\_evicted\_for lack of resources, or the Node fails.
+---
 
-**Note:**Restarting a container in a Pod should not be confused with restarting the Pod. The Pod itself does not run, but is an environment the containers run in and persists until it is deleted.
+在Kubernetes中，很少去直接创建独立的Pods，即使是一个Pods，这是因为Pods被设计为相对短暂的、一次性的实体。当一个Pod被创建（你可以创建，或者Controller间接创建），它会被调度到集群中的一个节点上去运行。Pod会一直运行在该节点，除非出现以下几种情形之一：进程终止、Pod对象被删除、Pod因缺少资源被evicte、节点失败。
 
-Pods do not, by themselves, self-heal. If a Pod is scheduled to a Node that fails, or if the scheduling operation itself fails, the Pod is deleted; likewise, a Pod won’t survive an eviction due to a lack of resources or Node maintenance. Kubernetes uses a higher-level abstraction, called a_Controller_, that handles the work of managing the relatively disposable Pod instances. Thus, while it is possible to use Pod directly, it’s far more common in Kubernetes to manage your pods using a Controller. See[Pods and Controllers](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/#pods-and-controllers)for more information on how Kubernetes uses Controllers to implement Pod scaling and healing.
+注意：不要将Pod中容器的重启与Pod的重启混淆。Pod本身不会运行，它只是容器运行的环境，并一直存在，直到被删除。
+
+Pods没有自愈的能力。如果一个Pod被调度到一个失败的节点上，或者调度操作本身失败了，该Pod就会删除；同样地，Pods不会在由于资源缺少或节点维护时发生eviction时存活。Kubernetes使用更高级别的抽象，叫做Controller，来管理这些相对短暂的Pod实例。因此，即使可以直接创建Pod，但Kubernetes中，更为常见的是通过Controller来管理你的Pods。关于Kubernetes如何使用Controllers实现Pod的伸缩和复原的内容见[Pods and Controllers](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/#pods-and-controllers)。
 
 ### Pods and Controllers {#pods-and-controllers}
 
-A Controller can create and manage multiple Pods for you, handling replication and rollout and providing self-healing capabilities at cluster scope. For example, if a Node fails, the Controller might automatically replace the Pod by scheduling an identical replacement on a different Node.
+Controller可以帮你来创建和管理多个Pods、处理副本、回滚、提供自愈能力。比如，如果一个节点失败，Controller会自动调度一个相同的Pod到另一个节点上来完成Pod的替代。
 
-Some examples of Controllers that contain one or more pods include:
+包含一个或多个Pods的Controllers包括但不限于：
 
 * [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
 * [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)
 * [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)
 
-In general, Controllers use a Pod Template that you provide to create the Pods for which it is responsible.
+通常来说，Controllers可以使用你提供的Pod模板来创建它负责的Pods。
 
-## Pod Templates {#pod-templates}
+## Pod 模板 {#pod-templates}
 
-Pod templates are pod specifications which are included in other objects, such as[Replication Controllers](https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/),[Jobs](https://kubernetes.io/docs/concepts/jobs/run-to-completion-finite-workloads/), and[DaemonSets](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/). Controllers use Pod Templates to make actual pods. The sample below is a simple manifest for a Pod which contains a container that prints a message.
+---
+
+Pod模板是包含在其他对象（如[Replication Controllers](https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/)，[Jobs](https://kubernetes.io/docs/concepts/jobs/run-to-completion-finite-workloads/)和[DaemonSets](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)）中的Pod定义。Controllers使用Pod模板来制作实际的Pods。下面的示例是包含一个会打印信息的容器的Pod的清单。
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+spec:
+  containers:
+  - name: myapp-container
+    image: busybox
+    command: ['sh', '-c', 'echo Hello Kubernetes! && sleep 3600']
+```
+
+Pod模板相当于一个饼干模具，而不是去定义所有副本的期望状态。一旦饼干从模具中取出，这个饼干就与模具没有任何关系了。这里没有“量子纠缠”。该模板后续的修改或者切换到一个新的模板并不会对已经创建的Pods产生影响。同样地，被replication controller创建的Pods可以直接进行后续的更新操作。这与Pods形成鲜明对比，Pod指明了属于该Pod的所有容器的当前期望状态。这种方法从根本上简化了系统语义并增加了原语的灵活性。
+
+
+
+  
+
+
+
+
+
 
