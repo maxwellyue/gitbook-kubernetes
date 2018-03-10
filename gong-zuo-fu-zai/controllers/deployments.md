@@ -266,7 +266,19 @@ Events:
 
 ### Rollover \(又叫 multiple updates in-flight\) {#rollover-aka-multiple-updates-in-flight}
 
+每当Deployment controller观察到有新的Deployment对象，就会创建一个新的ReplicaSet来启动期望的Pods。已经存在的 ReplicaSet会控制那些标签匹配`.spec.selector`的Pods，那些模板不匹配`.spec.template`的Pods就被scaled down。最终买新的ReplicaSet 将会scaled to`.spec.replicas`，所有旧的ReplicaSets 将会scaled to 0.
+
+如果你在一次rollout正在执行的过程中对Deployment进行更新操作，该Deployment将会为每次更新创建一个新的ReplicaSet，将其 scaling，并会roll over之前的ReplicaSet。它会将旧的ReplicaSet添加到旧ReplicaSets列表，并将其scaling down。
+
+比如，假如你创建了一个Deployment 来创建5 个`nginx:1.7.9`副本，但是当只有3个`nginx:1.7.9`副本被创建时，你更新了该Deployment 来让它创建5个`nginx:1.9.1`, 副本。在这种情况下，Deployment 会立即开始杀死这3个已经创建的`nginx:1.7.9`Pods，并开始创建`nginx:1.9.1`Pods。它不会等到这5个`nginx:1.7.9`Pods都创建好之后再去改变。
+
   
+
+
+
+
+
+
 
 
 
