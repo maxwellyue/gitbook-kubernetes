@@ -24,6 +24,11 @@
 * 容器
 * [工作负载](gong-zuo-fu-zai.md)
   * [Pods](gong-zuo-fu-zai/pods.md)
+    * [Pods综述](gong-zuo-fu-zai/pods/podszong-shu.md)
+    * Pods
+    * Pods生命周期
+    * Pods Preset
+    * Disruptions
   * [Controllers](gong-zuo-fu-zai/controllers.md)
 * [配置](pei-zhi.md)
   * [Configuration最佳实践](pei-zhi/configurationzui-jia-shi-jian.md)
