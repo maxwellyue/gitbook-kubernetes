@@ -31,7 +31,7 @@
     * Disruptions
   * [Controllers](gong-zuo-fu-zai/controllers.md)
     * ReplicaSet
-    * ReplicationConroller
+    * [ReplicationConroller](gong-zuo-fu-zai/controllers/replicationconroller.md)
     * Deployments
     * StatefulSets
     * DaemonSet
