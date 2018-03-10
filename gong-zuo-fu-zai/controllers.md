@@ -18,13 +18,103 @@ ReplicaSet是下一代的Replication Controller。目前，ReplicaSet和Replicat
 
 ---
 
+ReplicaSet会确保在任意时刻，都有指定数量的Pod副本在运行。但是，Deployment是一个更高级别的概念，用来管理ReplicaSets并为Pod提供声明性更新（declarative updates），同时还有一些其他拥有的功能。因此，我们推荐使用Deployments，而不是直接使用ReplicaSets，除非你想要定制更新编排或根本不需要更新。
+
+这其实是说，你可能永远不必手动操作ReplicaSet对象：而是使用Deployment，并在它的spec部分定义你的应用。
+
+## 例子
+
+---
+
+```
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: frontend
+    matchExpressions:
+      - {key: tier, operator: In, values: [frontend]}
+  template:
+    metadata:
+      labels:
+        app: guestbook
+        tier: frontend
+    spec:
+      containers:
+      - name: php-redis
+        image: gcr.io/google_samples/gb-frontend:v3
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        env:
+        - name: GET_HOSTS_FROM
+          value: dns
+          # If your cluster config does not include a dns service, then to
+          # instead access environment variables to find service host
+          # info, comment out the 'value: dns' line above, and uncomment the
+          # line below.
+          # value: env
+        ports:
+        - containerPort: 80
+```
+
+将这份清单保存到`frontend.yaml`文件中，并将其提交给Kubernetes集群，就会创建定义好的ReplicaSet和它管理的Pods。
+
+```
+$ kubectl create -f frontend.yaml
+replicaset "frontend" created
+$ kubectl describe rs/frontend
+Name:		frontend
+Namespace:	default
+Selector:	tier=frontend,tier in (frontend)
+Labels:		app=guestbook
+		tier=frontend
+Annotations:	<none>
+Replicas:	3 current / 3 desired
+Pods Status:	3 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:       app=guestbook
+                tier=frontend
+  Containers:
+   php-redis:
+    Image:      gcr.io/google_samples/gb-frontend:v3
+    Port:       80/TCP
+    Requests:
+      cpu:      100m
+      memory:   100Mi
+    Environment:
+      GET_HOSTS_FROM:   dns
+    Mounts:             <none>
+  Volumes:              <none>
+Events:
+  FirstSeen    LastSeen    Count    From                SubobjectPath    Type        Reason            Message
+  ---------    --------    -----    ----                -------------    --------    ------            -------
+  1m           1m          1        {replicaset-controller }             Normal      SuccessfulCreate  Created pod: frontend-qhloh
+  1m           1m          1        {replicaset-controller }             Normal      SuccessfulCreate  Created pod: frontend-dnjpy
+  1m           1m          1        {replicaset-controller }             Normal      SuccessfulCreate  Created pod: frontend-9si5l
+$ kubectl get pods
+NAME             READY     STATUS    RESTARTS   AGE
+frontend-9si5l   1/1       Running   0          1m
+frontend-dnjpy   1/1       Running   0          1m
+frontend-qhloh   1/1       Running   0          1m
+```
+
+## 编写ReplicaSet Spec
+
+---
+
+todo  
 
 
-  
-  
-
-
-  
-  
 
 
