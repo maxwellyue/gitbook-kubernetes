@@ -360,6 +360,44 @@ Events:
 
 ##### 检查Deployment的Rollout历史
 
+首先，查看这个deployment的修改历史：
+
+```
+$ kubectl rollout history deployment/nginx-deployment
+deployments "nginx-deployment"
+REVISION    CHANGE-CAUSE
+1           kubectl create -f docs/user-guide/nginx-deployment.yaml --record
+2           kubectl set image deployment/nginx-deployment nginx=nginx:1.9.1
+3           kubectl set image deployment/nginx-deployment nginx=nginx:1.91
+```
+
+因为我们在创建该deployment的时候添加了`--record`参数，所以我们可以很容易地看到每次的修改。
+
+如果要查看某个REVISION的具体信息，可以运行：
+
+```
+$ kubectl rollout history deployment/nginx-deployment --revision=2
+deployments "nginx-deployment" revision 2
+  Labels:       app=nginx
+          pod-template-hash=1159050644
+  Annotations:  kubernetes.io/change-cause=kubectl set image deployment/nginx-deployment nginx=nginx:1.9.1
+  Containers:
+   nginx:
+    Image:      nginx:1.9.1
+    Port:       80/TCP
+     QoS Tier:
+        cpu:      BestEffort
+        memory:   BestEffort
+    Environment Variables:      <none>
+  No volumes.
+```
+
+##### 回滚到之前的Revision
+
+
+
+
+
 
 
 
