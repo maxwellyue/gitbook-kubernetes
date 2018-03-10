@@ -282,5 +282,19 @@ Events:
 * Selector updates – that is, changing the existing value in a selector key – result in the same behavior as additions.
 * Selector removals – that is, removing an existing key from the Deployment selector – do not require any changes in the pod template labels. No existing ReplicaSet is orphaned, and a new ReplicaSet is not created, but note that the removed label still exists in any existing Pods and ReplicaSets.
 
+## 回滚Deployment {#rolling-back-a-deployment}
+
+---
+
+有时，你需要回滚一个Deployment；比如，当一个Deployment不稳定时，比如一直崩溃。默认情况下，所有的Deployment的rollout历史都被保存在系统中，所以你在可以在任何时间进行回滚 \(你可以通过修改历史版本限制来改变保存多少历史版本\)。
+
+>**Note:**A 当触发Deployment的rollout时，Deployment的revision就会被创建。这意味着，新的revision当且仅当在该Deployment的 pod模板\(`.spec.template`\) 被修改的时候才会被创建。比如你修改了模板中的标签或容器镜像。其他修改，比如scaling该Deployment，不会创建一个Deployment revision，所以我们可以facilitate simultaneous manual- or auto-scaling。这意味着，当你回滚到较早版本的时候，只有Deployment的pod模板部分被回滚。
+
+
+
+
+
+
+
 
 
