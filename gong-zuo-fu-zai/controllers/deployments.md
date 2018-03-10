@@ -474,24 +474,18 @@ $
 kubectl get deploy
 NAME                 DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
 nginx-deployment     10        10        10           10          50s
-
 ```
 
 You update to a new image which happens to be unresolvable from inside the cluster.
 
 ```
-$ 
-kubectl 
-set 
-image deploy
-ginx-deployment 
+$ kubectl set image deploy nginx-deployment 
 nginx
 =
 nginx:sometag
 deployment 
 "nginx-deployment"
  image updated
-
 ```
 
 The image update starts a new rollout with ReplicaSet nginx-deployment-1989198191, but it’s blocked due to the`maxUnavailable`requirement that we mentioned above.
@@ -502,7 +496,6 @@ kubectl get rs
 NAME                          DESIRED   CURRENT   READY     AGE
 nginx-deployment-1989198191   5         5         0         9s
 nginx-deployment-618515232    8         8         8         1m
-
 ```
 
 Then a new scaling request for the Deployment comes along. The autoscaler increments the Deployment replicas to 15. The Deployment controller needs to decide where to add these new 5 replicas. If we weren’t using proportional scaling, all 5 of them would be added in the new ReplicaSet. With proportional scaling, we spread the additional replicas across all ReplicaSets. Bigger proportions go to the ReplicaSets with the most replicas and lower proportions go to ReplicaSets with less replicas. Any leftovers are added to the ReplicaSet with the most replicas. ReplicaSets with zero replicas are not scaled up.
@@ -520,15 +513,7 @@ kubectl get rs
 NAME                          DESIRED   CURRENT   READY     AGE
 nginx-deployment-1989198191   7         7         0         7m
 nginx-deployment-618515232    11        11        11        7m
-
 ```
-
-  
-
-
-
-
-
 
 
 
