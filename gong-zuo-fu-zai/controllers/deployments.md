@@ -327,7 +327,9 @@ nginx-deployment-3066724191-08mng   0/1       ImagePullBackOff   0          6s
 nginx-deployment-3066724191-eocby   0/1       ImagePullBackOff   0          6s
 ```
 
+**Note:**
 
+Deployment controller将会自动停止bad rollout，并会停止scaling up新的ReplicaSet。这取决于你指定的rollingUpdate 参数\(`maxUnavailable`\) . Kubernetes默认将其设置为1，并将`spec.replicas`设置为1，所以如果你不关心这些参数，你的Deployment默认会100%不可用！在未来版本中，Kubernetes 将会修复这点。
 
 
 
