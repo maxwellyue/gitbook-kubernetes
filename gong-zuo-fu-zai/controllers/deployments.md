@@ -272,20 +272,15 @@ Events:
 
 比如，假如你创建了一个Deployment 来创建5 个`nginx:1.7.9`副本，但是当只有3个`nginx:1.7.9`副本被创建时，你更新了该Deployment 来让它创建5个`nginx:1.9.1`, 副本。在这种情况下，Deployment 会立即开始杀死这3个已经创建的`nginx:1.7.9`Pods，并开始创建`nginx:1.9.1`Pods。它不会等到这5个`nginx:1.7.9`Pods都创建好之后再去改变。
 
-  
+### 更新标签选择器 {#label-selector-updates}
 
+通常来说，并不建议对标签选择器进行更新，应该在一开始就规划好标签选择器。在任何情况下，如果你需要进行标签选择器的更新，都要谨慎行事，并确保你掌握了所有的含义。
 
+> **Note:**在 API `apps/v1`版本中，一个Deployment的标签选择器一旦创建就不可改变。
 
-
-
-
-
-
-
-
-
-
-
+* Selector additions require the pod template labels in the Deployment spec to be updated with the new label too, otherwise a validation error is returned. This change is a non-overlapping one, meaning that the new selector does not select ReplicaSets and Pods created with the old selector, resulting in orphaning all old ReplicaSets and creating a new ReplicaSet.
+* Selector updates – that is, changing the existing value in a selector key – result in the same behavior as additions.
+* Selector removals – that is, removing an existing key from the Deployment selector – do not require any changes in the pod template labels. No existing ReplicaSet is orphaned, and a new ReplicaSet is not created, but note that the removed label still exists in any existing Pods and ReplicaSets.
 
 
 
