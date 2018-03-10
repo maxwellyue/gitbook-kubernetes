@@ -64,16 +64,18 @@ spec:
 
 * 创建了一个名称为`nginx-deployment`的Deployment，通过`metadata: name`字段来指定。
 * 这个Deployment会创建3个Pods副本，通过`replicas`字段来指定。
+* `selector`字段定义了该Deployment如何找到其管理的Pods。在这个例子中，我们使用定义在Pod模板中的一个标签（`app:nginx`）。只要Pod模板自身符合规则，也可以使用更复杂的选择器规则。
+* Pod模板的定义部分，即`template: spec`字段，指定Pod会运行一个`nginx`容器，该容器使用`nginx`1.7.9版本的镜像。
+* 该Deployment会开放80端口供Pods使用。 
 
+> Note: `matchLabels`is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of `matchExpressions`, whose key field is “key”, the operator is “In”, and the values array contains only “value”. The requirements are ANDed.
 
+`template`字段包含以下说明：
 
-
-
-
-
-
-
-
+* 这些Pods被打上`app: nginx`标签。
+* 创建一个名为`nginx`的容器。
+* `nginx`的镜像版本是`1.7.9`。
+* 开放`80`端口，以便该容器进行发生和接收数据。
 
 
 
