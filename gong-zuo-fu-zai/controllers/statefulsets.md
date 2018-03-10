@@ -99,5 +99,12 @@ spec:
           storage: 1Gi
 ```
 
+## Pod 选择器 {#pod-selector}
+
+---
+
+You must set the`spec.selector`field of a StatefulSet to match the labels of its`.spec.template.metadata.labels`. Prior to Kubernetes 1.8, the`spec.selector`field was defaulted when omitted. In 1.8 and later versions, failing to specify a matching Pod Selector will result in a validation error during StatefulSet creation.
+
+  
 
 
