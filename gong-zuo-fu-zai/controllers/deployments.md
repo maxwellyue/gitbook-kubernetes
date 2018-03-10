@@ -394,9 +394,60 @@ deployments "nginx-deployment" revision 2
 
 ##### 回滚到之前的Revision
 
+现在，我们决定撤销当前的rollout，并回滚到之前的revision：
 
+```
+$ kubectl rollout undo deployment/nginx-deployment
+deployment "nginx-deployment" rolled back
+```
 
+另外，你也可以通过定义来`--to-revision`来指定回滚的版本：
 
+```
+$ kubectl rollout undo deployment/nginx-deployment --to-revision=2
+deployment "nginx-deployment" rolled back
+```
+
+更多rollout相关的命令，请阅读[`kubectl rollout`](https://kubernetes.io/docs/user-guide/kubectl/v1.9/#rollout)。
+
+现在，该Deployment就回滚到了之前的稳定一个revision。Deployment controller会生成一个回滚到之前revision 2的`DeploymentRollback`事件。
+
+```
+$ kubectl get deployment
+NAME               DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   3         3         3            3           30m
+
+$ kubectl describe deployment
+Name:           nginx-deployment
+Namespace:      default
+CreationTimestamp:  Tue, 15 Mar 2016 14:48:04 -0700
+Labels:         app=nginx
+Selector:       app=nginx
+Replicas:       3 updated | 3 total | 3 available | 0 unavailable
+StrategyType:       RollingUpdate
+MinReadySeconds:    0
+RollingUpdateStrategy:  1 max unavailable, 1 max surge
+OldReplicaSets:     <none>
+NewReplicaSet:      nginx-deployment-1564180365 (3/3 replicas created)
+Events:
+  FirstSeen LastSeen    Count   From                    SubobjectPath   Type        Reason              Message
+  --------- --------    -----   ----                    -------------   --------    ------              -------
+  30m       30m         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled up replica set nginx-deployment-2035384211 to 3
+  29m       29m         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled up replica set nginx-deployment-1564180365 to 1
+  29m       29m         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled down replica set nginx-deployment-2035384211 to 2
+  29m       29m         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled up replica set nginx-deployment-1564180365 to 2
+  29m       29m         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled down replica set nginx-deployment-2035384211 to 0
+  29m       29m         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled up replica set nginx-deployment-3066724191 to 2
+  29m       29m         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled up replica set nginx-deployment-3066724191 to 1
+  29m       29m         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled down replica set nginx-deployment-1564180365 to 2
+  2m        2m          1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled down replica set nginx-deployment-3066724191 to 0
+  2m        2m          1       {deployment-controller }                Normal      DeploymentRollback  Rolled back deployment "nginx-deployment" to revision 2
+  29m       2m          2       {deployment-controller }                Normal      ScalingReplicaSet   Scaled up replica set nginx-deployment-1564180365 to 3
+```
+
+## 伸缩Deployment {#scaling-a-deployment}
+
+---
 
 
 
