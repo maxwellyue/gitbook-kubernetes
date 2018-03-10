@@ -288,13 +288,25 @@ Events:
 
 有时，你需要回滚一个Deployment；比如，当一个Deployment不稳定时，比如一直崩溃。默认情况下，所有的Deployment的rollout历史都被保存在系统中，所以你在可以在任何时间进行回滚 \(你可以通过修改历史版本限制来改变保存多少历史版本\)。
 
->**Note:**A 当触发Deployment的rollout时，Deployment的revision就会被创建。这意味着，新的revision当且仅当在该Deployment的 pod模板\(`.spec.template`\) 被修改的时候才会被创建。比如你修改了模板中的标签或容器镜像。其他修改，比如scaling该Deployment，不会创建一个Deployment revision，所以我们可以facilitate simultaneous manual- or auto-scaling。这意味着，当你回滚到较早版本的时候，只有Deployment的pod模板部分被回滚。
+> **Note:**A 当触发Deployment的rollout时，Deployment的revision就会被创建。这意味着，新的revision当且仅当在该Deployment的 pod模板\(`.spec.template`\) 被修改的时候才会被创建。比如你修改了模板中的标签或容器镜像。其他修改，比如scaling该Deployment，不会创建一个Deployment revision，所以我们可以facilitate simultaneous manual- or auto-scaling。这意味着，当你回滚到较早版本的时候，只有Deployment的pod模板部分被回滚。
 
+假如你在更新Deployment的时候，镜像名字应该是`nginx:1.9.1`，你却写成了`nginx:1.91`：
 
+```
+$ kubectl set image deployment/nginx-deployment nginx=nginx:1.91
+deployment "nginx-deployment" image updated
+```
 
+那么这次rollout就会被卡住：
 
+```
+$ kubectl rollout status deployments nginx-deployment
+Waiting for rollout to finish: 2 out of 3 new replicas have been updated...
+```
 
+按Ctrl-C来停止对rollout状态的观察。更多rollouts卡住的信息请[read more here](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#deployment-status)。
 
+你可以看到新（nginx-deployment-3066724191）、旧（nginx-deployment-1564180365 和 nginx-deployment-2035384211）副本集的数量都是2。
 
 
 
