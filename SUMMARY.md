@@ -33,7 +33,7 @@
     * ReplicaSet
     * [ReplicationConroller](gong-zuo-fu-zai/controllers/replicationconroller.md)
     * [Deployments](gong-zuo-fu-zai/controllers/deployments.md)
-    * StatefulSets
+    * [StatefulSets](gong-zuo-fu-zai/controllers/statefulsets.md)
     * DaemonSet
     * Garbage Collection
     * Jobs-Run to Completion
