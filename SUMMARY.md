@@ -25,7 +25,7 @@
 * [工作负载](gong-zuo-fu-zai.md)
   * [Pods](gong-zuo-fu-zai/pods.md)
     * [Pods综述](gong-zuo-fu-zai/pods/podszong-shu.md)
-    * Pods
+    * [Pods](gong-zuo-fu-zai/pods/pods.md)
     * Pods生命周期
     * Pods Preset
     * Disruptions
