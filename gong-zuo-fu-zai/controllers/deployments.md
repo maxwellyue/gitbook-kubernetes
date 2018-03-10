@@ -308,5 +308,23 @@ Waiting for rollout to finish: 2 out of 3 new replicas have been updated...
 
 你可以看到新（nginx-deployment-3066724191）、旧（nginx-deployment-1564180365 和 nginx-deployment-2035384211）副本集的数量都是2。
 
+```
+$ kubectl get rs
+NAME                          DESIRED   CURRENT   READY   AGE
+nginx-deployment-1564180365   2         2         0       25s
+nginx-deployment-2035384211   0         0         0       36s
+nginx-deployment-3066724191   2         2         2       6s
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
