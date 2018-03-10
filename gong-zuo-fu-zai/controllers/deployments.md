@@ -327,9 +327,38 @@ nginx-deployment-3066724191-08mng   0/1       ImagePullBackOff   0          6s
 nginx-deployment-3066724191-eocby   0/1       ImagePullBackOff   0          6s
 ```
 
-**Note:**
+**Note:**Deployment controller将会自动停止bad rollout，并会停止scaling up新的ReplicaSet。这取决于你指定的rollingUpdate 参数\(`maxUnavailable`\) . Kubernetes默认将其设置为1，并将`spec.replicas`设置为1，所以如果你不关心这些参数，你的Deployment默认会100%不可用！在未来版本中，Kubernetes 将会修复这点。
 
-Deployment controller将会自动停止bad rollout，并会停止scaling up新的ReplicaSet。这取决于你指定的rollingUpdate 参数\(`maxUnavailable`\) . Kubernetes默认将其设置为1，并将`spec.replicas`设置为1，所以如果你不关心这些参数，你的Deployment默认会100%不可用！在未来版本中，Kubernetes 将会修复这点。
+```
+$ kubectl describe deployment
+Name:           nginx-deployment
+Namespace:      default
+CreationTimestamp:  Tue, 15 Mar 2016 14:48:04 -0700
+Labels:         app=nginx
+Selector:       app=nginx
+Replicas:       2 updated | 3 total | 2 available | 2 unavailable
+StrategyType:       RollingUpdate
+MinReadySeconds:    0
+RollingUpdateStrategy:  1 max unavailable, 1 max surge
+OldReplicaSets:     nginx-deployment-1564180365 (2/2 replicas created)
+NewReplicaSet:      nginx-deployment-3066724191 (2/2 replicas created)
+Events:
+  FirstSeen LastSeen    Count   From                    SubobjectPath   Type        Reason              Message
+  --------- --------    -----   ----                    -------------   --------    ------              -------
+  1m        1m          1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled up replica set nginx-deployment-2035384211 to 3
+  22s       22s         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled up replica set nginx-deployment-1564180365 to 1
+  22s       22s         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled down replica set nginx-deployment-2035384211 to 2
+  22s       22s         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled up replica set nginx-deployment-1564180365 to 2
+  21s       21s         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled down replica set nginx-deployment-2035384211 to 0
+  21s       21s         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled up replica set nginx-deployment-1564180365 to 3
+  13s       13s         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled up replica set nginx-deployment-3066724191 to 1
+  13s       13s         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled down replica set nginx-deployment-1564180365 to 2
+  13s       13s         1       {deployment-controller }                Normal      ScalingReplicaSet   Scaled up replica set nginx-deployment-3066724191 to 2
+```
+
+为了修复这种rollout失败，我们需要将回滚到一个稳定的Deployment的revision。
+
+##### 检查Deployment的Rollout历史
 
 
 
