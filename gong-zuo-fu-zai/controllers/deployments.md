@@ -316,9 +316,16 @@ nginx-deployment-2035384211   0         0         0       36s
 nginx-deployment-3066724191   2         2         2       6s
 ```
 
+查看被创建的Pods，你会发现被新ReplicaSet创建的2个pods被卡在拉取镜像这一步。
 
-
-
+```
+$ kubectl get pods
+NAME                                READY     STATUS             RESTARTS   AGE
+nginx-deployment-1564180365-70iae   1/1       Running            0          25s
+nginx-deployment-1564180365-jbqqo   1/1       Running            0          25s
+nginx-deployment-3066724191-08mng   0/1       ImagePullBackOff   0          6s
+nginx-deployment-3066724191-eocby   0/1       ImagePullBackOff   0          6s
+```
 
 
 
