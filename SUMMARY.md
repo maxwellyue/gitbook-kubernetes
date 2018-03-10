@@ -32,7 +32,7 @@
   * [Controllers](gong-zuo-fu-zai/controllers.md)
     * ReplicaSet
     * [ReplicationConroller](gong-zuo-fu-zai/controllers/replicationconroller.md)
-    * Deployments
+    * [Deployments](gong-zuo-fu-zai/controllers/deployments.md)
     * StatefulSets
     * DaemonSet
     * Garbage Collection
