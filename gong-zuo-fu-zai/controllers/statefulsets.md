@@ -4,17 +4,21 @@
 
 ---
 
-StatefulSet是一个工作负载API对象（the workload API object），被用来管理有状态应用。 
+StatefulSet是一个工作负载API对象（the workload API object），被用来管理有状态应用。
 
-**Note:**StatefulSets从1.9版本开始稳定。 
+> **Note:**StatefulSets从1.9版本开始稳定。
 
-Manages the deployment and scaling of a set of[Pods](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/),_and provides guarantees about the ordering and uniqueness_of these Pods.
+管理deployment，对Pods进行伸缩，提供Pods的有序性和唯一性。
 
-Like a[Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/), a StatefulSet manages Pods that are based on an identical container spec. Unlike a Deployment, a StatefulSet maintains a sticky identity for each of their Pods. These pods are created from the same spec, but are not interchangeable: each has a persistent identifier that it maintains across any rescheduling.
+就像[Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)，一个StatefulSet管理那些基于相同容器定义的Pods。与Deployment不同的是，一个StatefulSet为每个它管理的Pods维护一个粘性身份（sticky identity）。这些pods通过相同的spec被创建，但并不通用：无论经过多少次重新调度，每一个Pod都有一个持久的识别码。
 
-A StatefulSet operates under the same pattern as any other Controller. You define your desired state in a StatefulSet_object_, and the StatefulSet_controller_makes any necessary updates to get there from the current state.
+StatefulSet与其他Controller的工作模式相同。你在一个StatefulSet对象中定义你期望的状态，StatefulSet Controller就会将它从当前状态更新到你期望的状态。 
 
-* 
+## 使用StatefulSets
+
+---
+
+
 
 
 
