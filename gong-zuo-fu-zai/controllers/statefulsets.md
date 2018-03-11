@@ -103,8 +103,13 @@ spec:
 
 ---
 
-You must set the`spec.selector`field of a StatefulSet to match the labels of its`.spec.template.metadata.labels`. Prior to Kubernetes 1.8, the`spec.selector`field was defaulted when omitted. In 1.8 and later versions, failing to specify a matching Pod Selector will result in a validation error during StatefulSet creation.
+你必须将StatefulSet的`spec.selector`字段设置成与它的标签`.spec.template.metadata.labels`相匹配。Kubernetes 1.8版本之前，`spec.selector`字段如果省略了，会设置默认值。在1.8及之后的版本，如果不能定义一个相匹配的Pod选择器，那么会在创建StatefulSet时发生校验错误。
 
-  
+
+
+
+
+
+
 
 
