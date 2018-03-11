@@ -79,11 +79,11 @@ A desired state of an object is described by a Deployment, and if changes to tha
 
 ---
 
-* Use`kubectl apply -f <directory>`or`kubectl create -f <directory>`. This looks for Kubernetes configuration in all`.yaml`,`.yml`, and`.json`files in`<directory>`and passes it to`apply`or`create`.
+* 使用`kubectl apply -f <directory>`或者`kubectl create -f <directory>`这两个命令。它们会寻找`<directory>`目录下所有的`.yaml`、`.yml`和`.json`格式的Kubernetes配置文件，并将这些配置文件传递给`apply`或者`create`命令。
 
-* Use label selectors for`get`and`delete`operations instead of specific object names. See the sections on[label selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors)and[using labels effectively](https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/#using-labels-effectively).
+* 进行`get`和`delete`操作的时候，使用标签选择器，而不是特定的对象的名字。更多见[label selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors)and[using labels effectively](https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/#using-labels-effectively)。
 
-* Use`kubectl run`and`kubectl expose`to quickly create single-container Deployments and Services. See[Use a Service to Access an Application in a Cluster](https://kubernetes.io/docs/tasks/access-application-cluster/service-access-application-cluster/)for an example.
+* 使用`kubectl run`和`kubectl expose`命令来快速创建一个单一容器的Deployments和Services。见[Use a Service to Access an Application in a Cluster](https://kubernetes.io/docs/tasks/access-application-cluster/service-access-application-cluster/)。
 
 
 
