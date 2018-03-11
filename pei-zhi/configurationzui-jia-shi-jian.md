@@ -55,21 +55,7 @@ FOO_SERVICE_PORT=<the port the Service is running on>
 
 ---
 
-* Define and use
-  [labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
-  that identify
-  **semantic attributes**
-  of your application or Deployment, such as
-  `{ app: myapp, tier: frontend, phase: test, deployment: v3 }`
-  . You can use these labels to select the appropriate Pods for other resources; for example, a Service that selects all
-  `tier: frontend`
-  Pods, or all
-  `phase: test`
-  components of
-  `app: myapp`
-  . See the
-  [guestbook](https://github.com/kubernetes/examples/tree/master/guestbook/)
-  app for examples of this approach.
+* 定义并使用标签来确定你的应用或者Deployment的语义属性，比如`{ app: myapp, tier: frontend, phase: test, deployment: v3 }`。你可以利用这些标签来为其他资源选择合适的Pods。查看[guestbook](https://github.com/kubernetes/examples/tree/master/guestbook/)来了解更多。
 
 A Service can be made to span multiple Deployments by omitting release-specific labels from its selector.[Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)make it easy to update a running service without downtime.
 
