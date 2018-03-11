@@ -137,37 +137,36 @@ Kubernetes会为每个VolumeClaimTemplate创建一个[PersistentVolume](https://
 
 StatefulSet controller创建Pod的时候，会为它添加一个形如`statefulset.kubernetes.io/pod-name`的标签，并将其设置为该Pod的名字。该标签可以允许你为StatefulSet中的Pods附加一个服务。
 
-## Deployment and Scaling Guarantees {#deployment-and-scaling-guarantees}
+## 部署和伸缩担保 {#deployment-and-scaling-guarantees}
 
 ---
 
-* For a StatefulSet with N replicas, when Pods are being deployed, they are created sequentially, in order from {0..N-1}.
-* When Pods are being deleted, they are terminated in reverse order, from {N-1..0}.
-* Before a scaling operation is applied to a Pod, all of its predecessors must be Running and Ready.
-* Before a Pod is terminated, all of its successors must be completely shutdown.
+* 对一个有N个副本的StatefulSet来说，当Pods被部署的时候，会按照 {0..N-1}的顺序进行。
+* 当Pods被删除的时候，会按照 {N-1..0}的顺序进行终止。
+* 当第i个Pod启动时，第i-1个Pod必须已经运行。
+* 当第i个Pod被删除时，第i+1个Pod必须已经完全关闭。
 
-The StatefulSet should not specify a`pod.Spec.TerminationGracePeriodSeconds`of 0. This practice is unsafe and strongly discouraged. For further explanation, please refer to[force deleting StatefulSet Pods](https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/).
+在StatefulSet中，不要将`pod.Spec.TerminationGracePeriodSeconds`设置为0。 这种实践是不安全的，强烈不推荐这么做。 更多解释，请参考[force deleting StatefulSet Pods](https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/)。
 
-When the nginx example above is created, three Pods will be deployed in the order web-0, web-1, web-2. web-1 will not be deployed before web-0 is[Running and Ready](https://kubernetes.io/docs/user-guide/pod-states/), and web-2 will not be deployed until web-1 is Running and Ready. If web-0 should fail, after web-1 is Running and Ready, but before web-2 is launched, web-2 will not be launched until web-0 is successfully relaunched and becomes Running and Ready.
+上面的例子中，当StatefulSet被创建时，3个Pods会按照web-0, web-1, web-2. web-1的顺序依次被创建，web-1不会在web-0运行和就绪之前部署，web-2也不会在web-1运行和就绪之前部署。如果在web-1运行和就绪之后，web-2启动之前，web-0失败了，那么web-2会一直等到web-0成功重启并运行和就绪之后才开始启动。
 
-If a user were to scale the deployed example by patching the StatefulSet such that`replicas=1`, web-2 would be terminated first. web-1 would not be terminated until web-2 is fully shutdown and deleted. If web-0 were to fail after web-2 has been terminated and is completely shutdown, but prior to web-1’s termination, web-1 would not be terminated until web-0 is Running and Ready.
+当用户对该部署进行伸缩时，比如将修改为`replicas=1`，则web-2 会最先被终止，web-1会在web-2完全关闭并删除之后再终止。如果web-0在web-2终止之后，web-1终止之前运行失败，那么web-1会一直等到web-0运行和就绪之后再终止。 
 
 ### Pod Management Policies {#pod-management-policies}
 
-In Kubernetes 1.7 and later, StatefulSet allows you to relax its ordering guarantees while preserving its uniqueness and identity guarantees via its`.spec.podManagementPolicy`field.
+在Kubernetes 1.7 及之后的版本中，StatefulSet允许你放宽它的有序性保证，但仍保留唯一性，可以通过`.spec.podManagementPolicy`字段设置。
 
 #### OrderedReady Pod Management {#orderedready-pod-management}
 
-`OrderedReady`pod management is the default for StatefulSets. It implements the behavior described[above](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#deployment-and-scaling-guarantees).
+StatefulSets默认的Pod管理方式是`OrderedReady`。它的行为描述如上。
 
 #### Parallel Pod Management {#parallel-pod-management}
 
-`Parallel`pod management tells the StatefulSet controller to launch or terminate all Pods in parallel, and to not wait for Pods to become Running and Ready or completely terminated prior to launching or terminating another Pod.
-
-  
+`Parallel`这种管理方式会告诉StatefulSet controller，它可以并行地去启动或终止所有的Pods，关闭和启动之前不必等待其他Pods完全关闭或月经运行和就绪。
 
 
-  
-  
+
+
+
 
 
