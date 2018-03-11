@@ -69,11 +69,8 @@ A desired state of an object is described by a Deployment, and if changes to tha
 
 ---
 
-* 容器默认的[imagePullPolicy](https://kubernetes.io/docs/concepts/containers/images/#updating-images)是`IfNotPresent`，当本地不存在时，[kubelet](https://kubernetes.io/docs/admin/kubelet/) 会进行拉取镜像操作。如果你想让Kubernetes每次启动容器的时候都去拉取镜像，请设置`imagePullPolicy: Always`。
-
-另外一种可选但已被废弃的方式是：为镜像设置`:latest`tag，这样会隐式地将`imagePullPolicy`设置为`Always`。
-
-**Note:**在生产环境中，你应该避免使用这种`:latest`tag 的方式，因此这样很难跟踪到底是哪个版本的镜像在运行，也很难回滚。
+* 容器默认的[imagePullPolicy](https://kubernetes.io/docs/concepts/containers/images/#updating-images)是`IfNotPresent`，当本地不存在时，[kubelet](https://kubernetes.io/docs/admin/kubelet/) 会进行拉取镜像操作。如果你想让Kubernetes每次启动容器的时候都去拉取镜像，请设置`imagePullPolicy: Always`。<br><br>另外一种可选但已被废弃的方式是：为镜像设置`:latest`tag，这样会隐式地将`imagePullPolicy`设置为`Always`。<br>
+>**Note:**在生产环境中，你应该避免使用这种`:latest`tag 的方式，因此这样很难跟踪到底是哪个版本的镜像在运行，也很难回滚。
 
 * 为确保容器总是使用同一版本的镜像，你可以定义镜像的[digest](https://docs.docker.com/engine/reference/commandline/pull/#pull-an-image-by-digest-immutable-identifier)\(比如  
   `sha256:45b23dee08af5e43a7fea6c4cf9c25ccf269ee113168c19722f87876677c5cb2`\)。这样会唯一标识一个特定版本的镜像，它永远不会被Kubernetes更新，除非你改变了digest的值。
