@@ -159,8 +159,45 @@ Daemon Pods确实会受 [taints and tolerations](https://kubernetes.io/docs/conc
 * **Service**
   以相同的Pod选择器创建一个服务，并且使用服务来随机访问其中一个节点中的Pods \(没办法访问指定的节点\)。
 
+## Updating a DaemonSet {#updating-a-daemonset}
 
+---
 
-  
+If node labels are changed, the DaemonSet will promptly add Pods to newly matching nodes and delete Pods from newly not-matching nodes.
+
+You can modify the Pods that a DaemonSet creates. However, Pods do not allow all fields to be updated. Also, the DaemonSet controller will use the original template the next time a node \(even with the same name\) is created.
+
+You can delete a DaemonSet. If you specify`--cascade=false`with`kubectl`, then the Pods will be left on the nodes. You can then create a new DaemonSet with a different template. The new DaemonSet with the different template will recognize all the existing Pods as having matching labels. It will not modify or delete them despite a mismatch in the Pod template. You will need to force new Pod creation by deleting the Pod or deleting the node.
+
+In Kubernetes version 1.6 and later, you can[perform a rolling update](https://kubernetes.io/docs/tasks/manage-daemon/update-daemon-set/)on a DaemonSet.
+
+## Alternatives to DaemonSet {#alternatives-to-daemonset}
+
+---
+
+### Init Scripts {#init-scripts}
+
+It is certainly possible to run daemon processes by directly starting them on a node \(e.g. using`init`,`upstartd`, or`systemd`\). This is perfectly fine. However, there are several advantages to running such processes via a DaemonSet:
+
+* Ability to monitor and manage logs for daemons in the same way as applications.
+* Same config language and tools \(e.g. Pod templates,
+  `kubectl`
+  \) for daemons and applications.
+* Running daemons in containers with resource limits increases isolation between daemons from app containers. However, this can also be accomplished by running the daemons in a container but not in a Pod \(e.g. start directly via Docker\).
+
+### Bare Pods {#bare-pods}
+
+It is possible to create Pods directly which specify a particular node to run on. However, a DaemonSet replaces Pods that are deleted or terminated for any reason, such as in the case of node failure or disruptive node maintenance, such as a kernel upgrade. For this reason, you should use a DaemonSet rather than creating individual Pods.
+
+### Static Pods {#static-pods}
+
+It is possible to create Pods by writing a file to a certain directory watched by Kubelet. These are called[static pods](https://kubernetes.io/docs/concepts/cluster-administration/static-pod/). Unlike DaemonSet, static Pods cannot be managed with kubectl or other Kubernetes API clients. Static Pods do not depend on the apiserver, making them useful in cluster bootstrapping cases. Also, static Pods may be deprecated in the future.
+
+### Deployments {#deployments}
+
+DaemonSets are similar to[Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)in that they both create Pods, and those Pods have processes which are not expected to terminate \(e.g. web servers, storage servers\).
+
+Use a Deployment for stateless services, like frontends, where scaling up and down the number of replicas and rolling out updates are more important than controlling exactly which host the Pod runs on. Use a DaemonSet when it is important that a copy of a Pod always run on all or certain hosts, and when it needs to start before other Pods.
+
 
 
