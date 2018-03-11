@@ -118,7 +118,7 @@ Also you should not normally create any Pods whose labels match this selector, e
 
 ---
 
-正常情况下，Pod运行在哪个节点是由Kubernetes 的调度器进行选择的。但是，由DaemonSet controller创建的Pods已经指定了机器\(`.spec.nodeName`会在被创建的时候被指定，因此它会被调度器忽略\)。因此： 
+正常情况下，Pod运行在哪个节点是由Kubernetes 的调度器进行选择的。但是，由DaemonSet controller创建的Pods已经指定了机器\(`.spec.nodeName`会在被创建的时候被指定，因此它会被调度器忽略\)。因此：
 
 * DaemonSet controller不会理睬节点的[`unschedulable`](https://kubernetes.io/docs/admin/node/#manual-node-administration)属性 。
 * DaemonSet controller可以在调度器还没有启动的时候就创建Pods，这一点可以help cluster bootstrap。
@@ -129,16 +129,24 @@ Daemon Pods确实会受 [taints and tolerations](https://kubernetes.io/docs/conc
 
 * `node.alpha.kubernetes.io/unreachable`
 
-这就保证了，当开启`TaintBasedEvictions`功能时，如果有节点问题，如网络分区，它们不会被evicted。 \(when the`TaintBasedEvictions`feature is not enabled, they are also not evicted in these scenarios, but due to hard-coded behavior of the NodeController rather than due to tolerations\).
+这就保证了，当开启`TaintBasedEvictions`功能时，如果有节点问题，如网络分区，它们不会被evicted。 \(如果`TaintBasedEvictions`功能没有开启，它们也不会在这些场景下被evicted，但这是由NodeController的硬编码行为导致的，而不是容忍度\)。
 
 它们也容忍以下两种`NoSchedule`污点：
 
 * `node.kubernetes.io/memory-pressure`
 * `node.kubernetes.io/disk-pressure`
 
-When the support to critical pods is enabled and the pods in a DaemonSet are labeled as critical, the Daemon pods are created with an additional`NoSchedule`toleration for the`node.kubernetes.io/out-of-disk`taint.
+当开启“关键Pod支持”功能，并且DaemonSet中的Pod被标记为“关键”，这些守护pods在创建时会添加对
 
-Note that all above`NoSchedule`taints above are created only in version 1.8 or later if the alpha feature`TaintNodesByCondition`is enabled.
+`node.kubernetes.io/out-of-disk`污点的`NoSchedule`容忍度。
 
-Also note that the`node-role.kubernetes.io/masterNoSchedule`toleration specified in the above example is needed on 1.6 or later to schedule on\_master\_nodes as this is not a default toleration.
+注意，上面所有的`NoSchedule` 相关污点只会在1.8户或之后的版本中提供，并且还要开启`TaintNodesByCondition`这个功能。
+
+同时也要注意，`node-role.kubernetes.io/masterNoSchedule`容忍度定义定义需要在1.6及更高版本中。
+
+
+
+
+
+
 
