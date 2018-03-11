@@ -144,9 +144,23 @@ Daemon Pods确实会受 [taints and tolerations](https://kubernetes.io/docs/conc
 
 同时也要注意，`node-role.kubernetes.io/masterNoSchedule`容忍度定义定义需要在1.6及更高版本中。
 
+## 与Daemon Pods进行通信 {#communicating-with-daemon-pods}
+
+---
+
+与DaemonSet中的Pods进行通信的方式有以下几种：
+
+* **Push**
+  DaemonSet中的Pods被配置成发送数据到另一个服务，比如统计服务器。此时，这些Pods没有客户端。
+* **NodeIP and Known Port**
+  DaemonSet中的Pods可以使用`hostPort`，这些就可以通过节点IP访问这些Pods。客户端通过某种方式获取所有IP，并按照事前约定获取端口。
+* **DNS**
+  以相同的Pod选择器创建一个[headless service](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)，然后就可以使用`endpoints`资源发现DaemonSet或者从DNS中获取多个Pods的记录。
+* **Service**
+  以相同的Pod选择器创建一个服务，并且使用服务来随机访问其中一个节点中的Pods \(没办法访问指定的节点\)。
 
 
 
-
+  
 
 
