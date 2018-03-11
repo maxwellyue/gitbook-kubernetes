@@ -107,9 +107,28 @@ spec:
 
 
 
+## Pod 身份标识 {#pod-identity}
 
+---
 
+StatefulSet的Pods有一个由一个序号、一个稳定的网络标识和稳定的存储组成的唯一身份标识。无论该Pod被调度到哪个节点，这个身份标识都会与该Pod紧密关联。
 
+### Ordinal Index {#ordinal-index}
 
+对于一个拥有N个副本的StatefulSet来说，每个Pod都会分配一个整数序号，范围是0~N-1，在该StatefulSet内，每个Pod的序号都是唯一的。
+
+### Stable Network ID {#stable-network-id}
+
+StatefulSet中的每个Pod从StatefulSet的名称和Pod的序号派生出其主机名，这种结构的主机名为`$(statefulset name)-$(ordinal)`。上面的例子中，将会创建三个名称为`web-0,web-1,web-2`的Pods。StatefulSet可以使用[Headless Service](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)来控制Pods的域。该服务会通过`$(service name).$(namespace).svc.cluster.local`的形式管理域，其中“cluster.local”是指集群的域。当每个Pod被创建后，Pod会被分配形如`$(podname).$(governing service domain)`的相匹配的DNS子域，这个governing service 是通过StatefulSet中的`serviceName`属性中定义的。
+
+下面是集群域，服务名称，StatefulSet名称的一些示例选项，并说明了它们是如何影响StatefulSet中Pods的DNS名称的。
+
+| Cluster Domain | Service \(ns/name\) | StatefulSet \(ns/name\) | StatefulSet Domain | Pod DNS | Pod Hostname |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| cluster.local | default/nginx | default/web | nginx.default.svc.cluster.local | web-{0..N-1}.nginx.default.svc.cluster.local | web-{0..N-1} |
+| cluster.local | foo/nginx | foo/web | nginx.foo.svc.cluster.local | web-{0..N-1}.nginx.foo.svc.cluster.local | web-{0..N-1} |
+| kube.local | foo/nginx | foo/web | nginx.foo.svc.kube.local | web-{0..N-1}.nginx.foo.svc.kube.local | web-{0..N-1} |
+
+  
 
 
