@@ -34,7 +34,7 @@
     * [ReplicationConroller](gong-zuo-fu-zai/controllers/replicationconroller.md)
     * [Deployments](gong-zuo-fu-zai/controllers/deployments.md)
     * [StatefulSets](gong-zuo-fu-zai/controllers/statefulsets.md)
-    * DaemonSet
+    * [DaemonSet](gong-zuo-fu-zai/controllers/daemonset.md)
     * Garbage Collection
     * Jobs-Run to Completion
     * CronJob
