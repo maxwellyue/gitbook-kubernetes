@@ -14,7 +14,7 @@
 
 * 配置文件在推送到集群之前，应该存储在版本控制工具中。这样你就可以在需要的时候快速地回滚某个配置。同时，这也有助于群集重建和恢复。
 
-* 使用YAML格式，而非JSON格式来编写配置文件。尽管这两种格式几乎在所有场景都可以互换，但YAML对用户更友好。 
+* 使用YAML格式，而非JSON格式来编写配置文件。尽管这两种格式几乎在所有场景都可以互换，但YAML对用户更友好。
 
 * 只要有意义，就将相关的对象定义在同一个文件中。管理一个文件通常比管理多个文件更容易。语法可以参考[guestbook-all-in-one.yaml](https://github.com/kubernetes/examples/tree/master/guestbook/all-in-one/guestbook-all-in-one.yaml)文件。
 
@@ -36,28 +36,24 @@
 
 ---
 
-* 在创建与[Service](https://kubernetes.io/docs/concepts/services-networking/service/)相关的后台工作负载\(Deployments 或者 ReplicaSets\)之前，也在其他工作负载需要访问该服务之前，去创建服务。当Kubernetes启动一个容器，会在容器启动时为该容器提供所有运行中的服务的环境变流量。例如，如果名为`foo`的服务已经存在，所有的容器都会在它们的初始环境中获取以下变量：
+* 在创建与[Service](https://kubernetes.io/docs/concepts/services-networking/service/)相关的后台工作负载\(Deployments 或者 ReplicaSets\)之前，也在其他工作负载需要访问该服务之前，去创建Service。当Kubernetes启动一个容器，会在容器启动时为该容器提供所有运行中的服务的环境变流量。例如，如果名为`foo`的服务已经存在，所有的容器都会在它们的初始环境中获取以下变量：
 
 ```
 FOO_SERVICE_HOST=<the host the Service is running on>
 FOO_SERVICE_PORT=<the port the Service is running on>
 ```
 
-       如果你
+如果你要在代码中访问Service，不要使用这些环境变量；使用服务的DNS名称（[DNS name of the Service](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/)）来代替。服务的环境变量仅仅提供给那些陈旧的应用：这些应用不能修改来使用DNS查找，不能以灵活的方式访问服务。
 
-If you are writing code that talks to a Service, don’t use these environment variables; use the[DNS name of the Service](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/)instead. Service environment variables are provided only for older software which can’t be modified to use DNS lookups, and are a much less flexible way of accessing Services.
+* 除非绝对必要，否则不要为Pod定义`hostPort`属性。当你为Pod绑定了一个`hostPort`，就会限制该Pod可以被调度的节点的数量，因为每一个 &lt;`hostIP`,`hostPort`,`protocol`&gt; 组合都是唯一的。如果你不明确指定`hostIP`和`protocol`，Kubernetes 会使用`0.0.0.0`作为`hostIP`的默认值，使用`TCP`作为`protocol`的默认值。如果你为了调试需要访问pod，可以使用[apiserver proxy](https://kubernetes.io/docs/tasks/access-application-cluster/access-cluster/#manually-constructing-apiserver-proxy-urls)或者[`kubectl port-forward`](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/)。如果你确实需要向外暴露某个节点上的Pod端口，在使用`hostPort`之前优先考虑使用 [NodePort](https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport) Service。
 
-* Don’t specify a`hostPort`for a Pod unless it is absolutely necessary. When you bind a Pod to a`hostPort`, it limits the number of places the Pod can be scheduled, because each &lt;`hostIP`,`hostPort`,`protocol`&gt; combination must be unique. If you don’t specify the`hostIP`and`protocol`explicitly, Kubernetes will use`0.0.0.0`as the default`hostIP`and`TCP`as the default`protocol`.
+* 避免使用`hostNetwork`，原因同`hostPort`。
 
-  If you only need access to the port for debugging purposes, you can use the[apiserver proxy](https://kubernetes.io/docs/tasks/access-application-cluster/access-cluster/#manually-constructing-apiserver-proxy-urls)or[`kubectl port-forward`](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/).
+* 如果你不需要`kube-proxy`的负载均衡功能，请使用[headless Services](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)\(which have a`ClusterIP`of`None`\) 进行服务发现。
 
-  If you explicitly need to expose a Pod’s port on the node, consider using a[NodePort](https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport)Service before resorting to`hostPort`.
+## 使用标签 {#using-labels}
 
-* Avoid using`hostNetwork`, for the same reasons as`hostPort`.
-
-* Use[headless Services](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)\(which have a`ClusterIP`of`None`\) for easy service discovery when you don’t need`kube-proxy`load balancing.
-
-## Using Labels {#using-labels}
+---
 
 * Define and use
   [labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
@@ -91,10 +87,10 @@ A desired state of an object is described by a Deployment, and if changes to tha
 
   **Note:**You should avoid using the`:latest`tag when deploying containers in production, because this makes it hard to track which version of the image is running and hard to roll back.
 
-* To make sure the container always uses the same version of the image, you can specify its
-  [digest](https://docs.docker.com/engine/reference/commandline/pull/#pull-an-image-by-digest-immutable-identifier)
-  \(for example
-  `sha256:45b23dee08af5e43a7fea6c4cf9c25ccf269ee113168c19722f87876677c5cb2`
+* To make sure the container always uses the same version of the image, you can specify its  
+  [digest](https://docs.docker.com/engine/reference/commandline/pull/#pull-an-image-by-digest-immutable-identifier)  
+  \(for example  
+  `sha256:45b23dee08af5e43a7fea6c4cf9c25ccf269ee113168c19722f87876677c5cb2`  
   \). This uniquely identifies a specific version of the image, so it will never be updated by Kubernetes unless you change the digest value.
 
 ## Using kubectl {#using-kubectl}
