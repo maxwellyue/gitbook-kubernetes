@@ -150,7 +150,7 @@ StatefulSet controller创建Pod的时候，会为它添加一个形如`statefuls
 
 上面的例子中，当StatefulSet被创建时，3个Pods会按照web-0, web-1, web-2. web-1的顺序依次被创建，web-1不会在web-0运行和就绪之前部署，web-2也不会在web-1运行和就绪之前部署。如果在web-1运行和就绪之后，web-2启动之前，web-0失败了，那么web-2会一直等到web-0成功重启并运行和就绪之后才开始启动。
 
-当用户对该部署进行伸缩时，比如将修改为`replicas=1`，则web-2 会最先被终止，web-1会在web-2完全关闭并删除之后再终止。如果web-0在web-2终止之后，web-1终止之前运行失败，那么web-1会一直等到web-0运行和就绪之后再终止。 
+当用户对该部署进行伸缩时，比如将修改为`replicas=1`，则web-2 会最先被终止，web-1会在web-2完全关闭并删除之后再终止。如果web-0在web-2终止之后，web-1终止之前运行失败，那么web-1会一直等到web-0运行和就绪之后再终止。
 
 ### Pod Management Policies {#pod-management-policies}
 
@@ -164,9 +164,28 @@ StatefulSets默认的Pod管理方式是`OrderedReady`。它的行为描述如上
 
 `Parallel`这种管理方式会告诉StatefulSet controller，它可以并行地去启动或终止所有的Pods，关闭和启动之前不必等待其他Pods完全关闭或月经运行和就绪。
 
+## 更新策略 {#update-strategies}
+
+---
+
+在Kubernetes 1.7 及之后的版本中，StatefulSet的`.spec.updateStrategy`属性允许你去配置或关闭自动对容器、标签、资源请求/限制、注释等。
+
+### On Delete {#on-delete}
+
+`OnDelete`更新策略实现了传统（1.6及之前版本）的行为。当StatefulSet的`.spec.updateStrategy.type`属性设置为 `OnDelete`时， StatefulSet controller不会自动更新StatefulSet中的Pods。用户必须手动删除Pods去触发controller来创建可以反映StatefulSet中`.spec.template`修改的新的Pods。
+
+### Rolling Updates {#rolling-updates}
+
+`RollingUpdate` 更新策略实现了对Pods的自动的、滚动的升级。当`spec.updateStrategy`未定义时，它是默认的更新策略。当一个StatefulSet的`.spec.updateStrategy.type`被设置为`RollingUpdate`时，StatefulSet controller 会删除并重新创建StatefulSet中的每一个Pod。它会按照Pod终止时的顺序（从大到小的序号），对Pod进行逐一更新。它会一直等到之前的Pod已被更新成功才会开始下一个Pod的更新。
+
+#### Partitions {#partitions}
+
+`RollingUpdate`更新策略可以通过定义`.spec.updateStrategy.rollingUpdate.partition`进行分区。如果定义了该参数，当StatefulSet的`.spec.template`属性被更新后，所有序号大于等于该值的Pods会被更新。而小于该值的Pods则不会更新，即使它们被删除，也会从之前版本进行重新创建。如果`.spec.updateStrategy.rollingUpdate.partition`的值比`.spec.replicas`还大，那么对`.spec.template`的修改不会传播到Pods中。在绝大多数情况下，你都用不到分区，但是如果你想 stage an update, roll out a canary, or perform a phased roll out，他就会非常有用。
 
 
 
 
+
+  
 
 
