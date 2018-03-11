@@ -35,7 +35,7 @@
     * [Deployments](gong-zuo-fu-zai/controllers/deployments.md)
     * [StatefulSets](gong-zuo-fu-zai/controllers/statefulsets.md)
     * [DaemonSet](gong-zuo-fu-zai/controllers/daemonset.md)
-    * Garbage Collection
+    * [Garbage Collection](gong-zuo-fu-zai/controllers/garbage-collection.md)
     * Jobs-Run to Completion
     * CronJob
 * [配置](pei-zhi.md)
