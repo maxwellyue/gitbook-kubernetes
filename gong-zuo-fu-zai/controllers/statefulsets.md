@@ -105,8 +105,6 @@ spec:
 
 你必须将StatefulSet的`spec.selector`字段设置成与它的标签`.spec.template.metadata.labels`相匹配。Kubernetes 1.8版本之前，`spec.selector`字段如果省略了，会设置默认值。在1.8及之后的版本，如果不能定义一个相匹配的Pod选择器，那么会在创建StatefulSet时发生校验错误。
 
-
-
 ## Pod 身份标识 {#pod-identity}
 
 ---
@@ -129,6 +127,47 @@ StatefulSet中的每个Pod从StatefulSet的名称和Pod的序号派生出其主�
 | cluster.local | foo/nginx | foo/web | nginx.foo.svc.cluster.local | web-{0..N-1}.nginx.foo.svc.cluster.local | web-{0..N-1} |
 | kube.local | foo/nginx | foo/web | nginx.foo.svc.kube.local | web-{0..N-1}.nginx.foo.svc.kube.local | web-{0..N-1} |
 
+要注意，集群域会被设置为`cluster.local`，除非[otherwise configured](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#how-it-works)。
+
+### Stable Storage
+
+Kubernetes会为每个VolumeClaimTemplate创建一个[PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)。在上面的例子中，每个Pod都会获得StorageClass为`my-storage-class` ，大小为1Gib的PersistentVolume。如果不指定StorageClass，就会使用默认的StorageClass。当Pod被调度到一个节点是，它的`volumeMounts`会挂载到PersistentVolumes中。注意，与该Pod持久卷声明关联的PersistentVolumes不会在Pods或StatefulSet删除时被删除。它只能通过手动进行删除。
+
+### Pod Name Label {#pod-name-label}
+
+StatefulSet controller创建Pod的时候，会为它添加一个形如`statefulset.kubernetes.io/pod-name`的标签，并将其设置为该Pod的名字。该标签可以允许你为StatefulSet中的Pods附加一个服务。
+
+## Deployment and Scaling Guarantees {#deployment-and-scaling-guarantees}
+
+---
+
+* For a StatefulSet with N replicas, when Pods are being deployed, they are created sequentially, in order from {0..N-1}.
+* When Pods are being deleted, they are terminated in reverse order, from {N-1..0}.
+* Before a scaling operation is applied to a Pod, all of its predecessors must be Running and Ready.
+* Before a Pod is terminated, all of its successors must be completely shutdown.
+
+The StatefulSet should not specify a`pod.Spec.TerminationGracePeriodSeconds`of 0. This practice is unsafe and strongly discouraged. For further explanation, please refer to[force deleting StatefulSet Pods](https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/).
+
+When the nginx example above is created, three Pods will be deployed in the order web-0, web-1, web-2. web-1 will not be deployed before web-0 is[Running and Ready](https://kubernetes.io/docs/user-guide/pod-states/), and web-2 will not be deployed until web-1 is Running and Ready. If web-0 should fail, after web-1 is Running and Ready, but before web-2 is launched, web-2 will not be launched until web-0 is successfully relaunched and becomes Running and Ready.
+
+If a user were to scale the deployed example by patching the StatefulSet such that`replicas=1`, web-2 would be terminated first. web-1 would not be terminated until web-2 is fully shutdown and deleted. If web-0 were to fail after web-2 has been terminated and is completely shutdown, but prior to web-1’s termination, web-1 would not be terminated until web-0 is Running and Ready.
+
+### Pod Management Policies {#pod-management-policies}
+
+In Kubernetes 1.7 and later, StatefulSet allows you to relax its ordering guarantees while preserving its uniqueness and identity guarantees via its`.spec.podManagementPolicy`field.
+
+#### OrderedReady Pod Management {#orderedready-pod-management}
+
+`OrderedReady`pod management is the default for StatefulSets. It implements the behavior described[above](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#deployment-and-scaling-guarantees).
+
+#### Parallel Pod Management {#parallel-pod-management}
+
+`Parallel`pod management tells the StatefulSet controller to launch or terminate all Pods in parallel, and to not wait for Pods to become Running and Ready or completely terminated prior to launching or terminating another Pod.
+
+  
+
+
+  
   
 
 
