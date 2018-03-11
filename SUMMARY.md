@@ -40,7 +40,17 @@
     * CronJob
 * [配置](pei-zhi.md)
   * [Configuration最佳实践](pei-zhi/configurationzui-jia-shi-jian.md)
-* 服务、负载均衡和网络
+  * 管理容器的计算资源
+  * 分配Pods到节点
+  * 污点和容忍度
+  * Secrets
+* [服务、负载均衡和网络](fu-wu-3001-fu-zai-jun-heng-he-wang-luo.md)
+  * 服务
+  * 服务和Pods的DNS
+  * 连接应用和服务
+  * Ingress
+  * 网络策略
+  * 通过HostAliases为Pod/etc/hosts等添加entries
 * 存储
 * 集群管理
 * [实践](shi-jian.md)
