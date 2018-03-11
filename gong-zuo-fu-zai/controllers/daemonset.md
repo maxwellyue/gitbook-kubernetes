@@ -83,7 +83,7 @@ DaemonSet同样需要[`.spec`](https://git.k8s.io/community/contributors/devel/a
 
 #### Pod 模板
 
-在`.spec`中，`.spec.template`是必须的。 
+在`.spec`中，`.spec.template`是必须的。
 
 `.spec.template`是Pod的模板。它与Pod定义完全一致，但不需要 `apiVersion`或者`kind`。
 
@@ -100,9 +100,9 @@ As of Kubernetes 1.8, you must specify a pod selector that matches the labels of
 The`spec.selector`is an object consisting of two fields:
 
 * `matchLabels`
-  - works the same as the`.spec.selector`of a [ReplicationController](https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/)。
+  * works the same as the`.spec.selector`of a [ReplicationController](https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/)。
 * `matchExpressions`
-  - allows to build more sophisticated selectors by specifying key, list of values and an operator that relates the key and values.
+  * allows to build more sophisticated selectors by specifying key, list of values and an operator that relates the key and values.
 
 When the two are specified the result is ANDed.
 
@@ -118,21 +118,20 @@ Also you should not normally create any Pods whose labels match this selector, e
 
 ---
 
-Normally, the machine that a Pod runs on is selected by the Kubernetes scheduler. However, Pods created by the DaemonSet controller have the machine already selected \(`.spec.nodeName`is specified when the Pod is created, so it is ignored by the scheduler\). Therefore:
+正常情况下，Pod运行在哪个节点是由Kubernetes 的调度器进行选择的。但是，由DaemonSet controller创建的Pods已经指定了机器\(`.spec.nodeName`会在被创建的时候被指定，因此它会被调度器忽略\)。因此： 
 
-* The
-  [`unschedulable`](https://kubernetes.io/docs/admin/node/#manual-node-administration)
-  field of a node is not respected by the DaemonSet controller.
-* The DaemonSet controller can make Pods even when the scheduler has not been started, which can help cluster bootstrap.
+* DaemonSet controller不会理睬节点的[`unschedulable`](https://kubernetes.io/docs/admin/node/#manual-node-administration)属性 。
+* DaemonSet controller可以在调度器还没有启动的时候就创建Pods，这一点可以help cluster bootstrap。
 
-Daemon Pods do respect[taints and tolerations](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration), but they are created with`NoExecute`tolerations for the following taints with no`tolerationSeconds`:
+Daemon Pods确实会受 [taints and tolerations](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration)影响，但它们对下面两种污点的容忍会设置为`NoExecute`，并且没有 `tolerationSeconds`
 
 * `node.kubernetes.io/not-ready`
+
 * `node.alpha.kubernetes.io/unreachable`
 
-This ensures that when the`TaintBasedEvictions`alpha feature is enabled, they will not be evicted when there are node problems such as a network partition. \(When the`TaintBasedEvictions`feature is not enabled, they are also not evicted in these scenarios, but due to hard-coded behavior of the NodeController rather than due to tolerations\).
+这就保证了，当开启`TaintBasedEvictions`功能时，如果有节点问题，如网络分区，它们不会被evicted。 \(when the`TaintBasedEvictions`feature is not enabled, they are also not evicted in these scenarios, but due to hard-coded behavior of the NodeController rather than due to tolerations\).
 
-They also tolerate following`NoSchedule`taints:
+它们也容忍以下两种`NoSchedule`污点：
 
 * `node.kubernetes.io/memory-pressure`
 * `node.kubernetes.io/disk-pressure`
@@ -141,23 +140,5 @@ When the support to critical pods is enabled and the pods in a DaemonSet are lab
 
 Note that all above`NoSchedule`taints above are created only in version 1.8 or later if the alpha feature`TaintNodesByCondition`is enabled.
 
-Also note that the`node-role.kubernetes.io/masterNoSchedule`toleration specified in the above example is needed on 1.6 or later to schedule on_master_nodes as this is not a default toleration.
-
-  
-
-
-  
-  
-  
-
-
-
-
-
-
-
-
-
-
-
+Also note that the`node-role.kubernetes.io/masterNoSchedule`toleration specified in the above example is needed on 1.6 or later to schedule on\_master\_nodes as this is not a default toleration.
 
