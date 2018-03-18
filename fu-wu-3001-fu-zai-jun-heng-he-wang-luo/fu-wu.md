@@ -123,22 +123,17 @@ In this mode, kube-proxy watches Kubernetes Services and Endpoints, calls`netlin
 
 Similar to iptables, Ipvs is based on netfilter hook function, but uses hash table as the underlying data structure and works in the kernel space. That means ipvs redirects traffic much faster, and has much better performance when syncing proxy rules. Furthermore, ipvs provides more options for load balancing algorithm, such as:
 
-* `rr`
-  : round-robin
-* `lc`
-  : least connection
-* `dh`
-  : destination hashing
-* `sh`
-  : source hashing
-* `sed`
-  : shortest expected delay
-* `nq`
-  : never queue
+* `rr`: round-robin
+* `lc`: least connection
+* `dh`: destination hashing
+* `sh`: source hashing
+* `sed`: shortest expected delay
+* `nq`: never queue
 
-**Note:**ipvs mode assumes IPVS kernel modules are installed on the node before running kube-proxy. When kube-proxy starts with ipvs proxy mode, kube-proxy would validate if IPVS modules are installed on the node, if it’s not installed kube-proxy will fall back to iptables proxy mode.
+**Note:**ipvs mode assumes IPVS kernel modules are installed on the node before running kube-proxy. When kube-proxy starts with ipvs proxy mode, kube-proxy would validate if IPVS modules are installed on the node, if it’s not installed kube-proxy will fall back to iptables proxy mode.![](/assets/屏幕快照 2018-03-18 下午7.02.33.png)在这些代理模式中，任何绑定到该服务IP:PORT的流量都会被代理到一个适当的后端中，而客户端不会知道任何关于Kubernetes、Service或者Pods的信息。
 
+. Client-IP based session affinity can be selected by setting`service.spec.sessionAffinity`to “ClientIP” \(the default is “None”\), and you can set the max session sticky time by setting the field`service.spec.sessionAffinityConfig.clientIP.timeoutSeconds`if you have already set`service.spec.sessionAffinity`to “ClientIP” \(the default is “10800”\).
 
-
+  
 
 
