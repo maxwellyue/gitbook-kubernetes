@@ -40,9 +40,9 @@
     * CronJob
 * [配置](pei-zhi.md)
   * [Configuration最佳实践](pei-zhi/configurationzui-jia-shi-jian.md)
-  * 管理容器的计算资源
+  * [管理容器的计算资源](pei-zhi/guan-li-rong-qi-de-ji-suan-zi-yuan.md)
   * 分配Pods到节点
-  * 污点和容忍度
+  * [污点和容忍度](pei-zhi/wu-dian-he-rong-ren-du.md)
   * Secrets
 * [服务、负载均衡和网络](fu-wu-3001-fu-zai-jun-heng-he-wang-luo.md)
   * [服务](fu-wu-3001-fu-zai-jun-heng-he-wang-luo/fu-wu.md)
