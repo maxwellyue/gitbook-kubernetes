@@ -183,7 +183,7 @@ Kubernetes主要支持2种找到服务的方式：环境变量和DNS。
 
 当一个Pod运行在节点上的时候，kubelet会为每一个活着的Service添加一系列的环境变量。它同时支持[Docker links compatible](https://docs.docker.com/userguide/dockerlinks/)类型的变量 \(见[makeLinkVariables](http://releases.k8s.io/master/pkg/kubelet/envvars/envvars.go#L49)\)和简单的`{SVCNAME}_SERVICE_HOST`和`{SVCNAME}_SERVICE_PORT`变量，其中，Service名字是大写的，中间是下划线。
 
-例如，`"redis-master"`Service暴露TCP端口7369，并被分配了一个集群IP地址10.0.0.11，将会产生如下环境变量： 
+例如，`"redis-master"`Service暴露TCP端口7369，并被分配了一个集群IP地址10.0.0.11，将会产生如下环境变量：
 
 ```
 REDIS_MASTER_SERVICE_HOST=10.0.0.11
@@ -195,6 +195,45 @@ REDIS_MASTER_PORT_6379_TCP_PORT=6379
 REDIS_MASTER_PORT_6379_TCP_ADDR=10.0.0.11
 ```
 
+这也意味着一种顺序要求：Pod想要访问的任何Service都必须在Pod自身创建之前创建，否则将无法获取到该Service的环境变量。而DNS则没有这种限制。
+
+### DNS
+
+一个可选（也是强烈推荐的）插件是DNS服务。DNS服务将会监听新的Service的创建，并为Service创建一组DNS记录。如果集群中开启了DNS，那么所有的Pod都可以自动对Service的名字进行解析。
+
+比如，你在Kubernetes的“my-ns”的命名空间中有一个叫做“my-service”的Service，那么就会创建为“my-service.my-ns”创建一条DNS记录。“my-ns”命名空间中所有Pods都可以通过对“my-service”做名字查找来找到该Service。其他命名空间的中Pods必须通过“my-service.my-ns”才能找到。这些服务名字查找的结果就是该Service的集群IP。
+
+Kubernetes also supports DNS SRV \(service\) records for named ports. If the`"my-service.my-ns"Service`has a port named`"http"`with protocol`TCP`, you can do a DNS SRV query for`"_http._tcp.my-service.my-ns"`to discover the port number for`"http"`.
+
+The Kubernetes DNS server is the only way to access services of type`ExternalName`. More information is available in the[DNS Pods and Services](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/).
+
+## Headless services
+
+---
+
+Sometimes you don’t need or want load-balancing and a single service IP. In this case, you can create “headless” services by specifying`"None"`for the cluster IP \(`spec.clusterIP`\).
+
+This option allows developers to reduce coupling to the Kubernetes system by allowing them freedom to do discovery their own way. Applications can still use a self-registration pattern and adapters for other discovery systems could easily be built upon this API.
+
+For such`Services`, a cluster IP is not allocated, kube-proxy does not handle these services, and there is no load balancing or proxying done by the platform for them. How DNS is automatically configured depends on whether the service has selectors defined.
+
+### With selectors {#with-selectors}
+
+For headless services that define selectors, the endpoints controller creates`Endpoints`records in the API, and modifies the DNS configuration to return A records \(addresses\) that point directly to the`Pods`backing the`Service`.
+
+### Without selectors {#without-selectors}
+
+For headless services that do not define selectors, the endpoints controller does not create`Endpoints`records. However, the DNS system looks for and configures either:
+
+* CNAME records for
+  `ExternalName`
+  -type services.
+* A records for any
+  `Endpoints`
+  that share a name with the service, for all other types.
+
+  
+  
   
 
 
