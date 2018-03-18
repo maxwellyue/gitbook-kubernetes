@@ -42,11 +42,64 @@ Kubernetes中`Services`支持`TCP`和`UDP`协议。默认是`TCP`协议。
 
 Services通常会抽象Pods的访问，但是Services也可以抽象其他类型backends。比如：
 
-Services generally abstract access to Kubernetes`Pods`, but they can also abstract other kinds of backends. For example:
-
 * 你想在生产环境中使用一个外部数据库集群，但在测试环境中使用你自己的数据库。
+
 * 你想为在另一个命名空间或另一个集群中的服务提供接入。
+
 * 你正将你的工作负载迁移到Kubernetes中，但一些backends运行在Kubernetes之外。
 
-In any of these scenarios you can define a service without a selector:
+在这些场景，你可以定义一个没有选择器的Service：
+
+```
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-service
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9376
+```
+
+因为该服务没有选择器，所以不会创建相应的`Endpoints`对象。你需要手动将该服务与你自己定义的endpoints对应上：
+
+```
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: my-service
+subsets:
+  - addresses:
+      - ip: 1.2.3.4
+    ports:
+      - port: 9376
+```
+
+注意：Endpoint的IPs may not be loopback \(127.0.0.0/8\), link-local \(169.254.0.0/16\), or link-local multicast \(224.0.0.0/24\).
+
+访问没有选择器的Service，与访问有选择器的Service是一样的。流量将被路由到用户定义的endpoints上（ 上面的例子中就是`1.2.3.4:9376`\)。
+
+一个ExternalName类型的service是一种特殊的没有选择器的服务。它不会定义任何的端口或者endpoints。Rather, it serves as a way to return an alias to an external service residing outside the cluster.
+
+```
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-service
+  namespace: prod
+spec:
+  type: ExternalName
+  externalName: my.database.example.com
+```
+
+当寻找`my-service.prod.svc.CLUSTER`主机时，集群DNS服务将返回一个CNAME记录，其值为`my.database.example.com`。
+
+访问这样的服务，与访问其他服务是一样的，唯一的不同是，重定向发生在DNS层，不会发生代理或转发。之后你如果决定将你的数据库迁移到集群中，你可以启动它的Pods，添加适当的标签或者endpoints，并修改Service的类型。
+
+
+
+
+
+
 
