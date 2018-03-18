@@ -97,7 +97,46 @@ spec:
 
 访问这样的服务，与访问其他服务是一样的，唯一的不同是，重定向发生在DNS层，不会发生代理或转发。之后你如果决定将你的数据库迁移到集群中，你可以启动它的Pods，添加适当的标签或者endpoints，并修改Service的类型。
 
+## 虚拟IP和服务代理 {#virtual-ips-and-service-proxies}
 
+---
+
+Kubernetes集群中的每一个节点上都会运行一个`kube-proxy`。`kube-proxy`负责实现除`ExternalName`类型之外的Service的虚拟IP功能。在Kubernetes v1.0中，Service是四层结构的（TCP/UDP over IP\) ，代理完全是在用户空间中。在Kubernetes v1.1中，`Ingress`API 被添加进来，代表7层（HTTP）结构的Service，同时也添加了iptables，并且自Kubernetes v1.2起就成为了默认的操作模型。在Kubernetes v1.8.0-beta.0中， 又添加了ipvs代理。
+
+### 代理模式：userspace
+
+在这种模式下，kube-proxy会监听Kubernetes Master中的Service和Endpoints的新增和移除。它会为每一个Service在本地节点上打开一个端口（随机选择）。任何该代理端口的连接都会被代理到该Service的一个Pod上（被记录在Endpoints中）。使用哪个Pod是由Service的`SessionAffinity`决定的。Lastly, it installs iptables rules which capture traffic to the`Service`’s`clusterIP`\(which is virtual\) and`Port`and redirects that traffic to the proxy port which proxies the backend`Pod`. By default, the choice of backend is round robin.![](/assets/屏幕快照 2018-03-18 下午6.48.08.png)
+
+上图中的ServiceIP就是clusterIP。
+
+### 代理模式: iptables {#proxy-mode-iptables}
+
+在这种模式下，kube-proxy会监听Kubernetes Master中的Service和Endpoints的新增和移除。对每一个Service，it installs iptables rules which capture traffic to the`Service`’s`clusterIP`\(which is virtual\) and`Port`and redirects that traffic to one of the`Service`’s backend sets. For each`Endpoints`object, it installs iptables rules which select a backend`Pod`. By default, the choice of backend is random.
+
+显然，iptables不需要在userspace和kernelspace之间切换，它比userspace代理更快，更可靠。However, unlike the userspace proxier, the iptables proxier cannot automatically retry another`Pod`if the one it initially selects does not respond, so it depends on having working[readiness probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#defining-readiness-probes).![](/assets/屏幕快照 2018-03-18 下午6.55.27.png)上图中的ServiceIP就是clusterIP。
+
+### 代理模式: ipvs {#proxy-mode-ipvs}
+
+**FEATURE STATE:**`Kubernetes v1.9`[beta](https://kubernetes.io/docs/concepts/services-networking/service/#)
+
+In this mode, kube-proxy watches Kubernetes Services and Endpoints, calls`netlink`interface to create ipvs rules accordingly and syncs ipvs rules with Kubernetes Services and Endpoints periodically, to make sure ipvs status is consistent with the expectation. When Service is accessed, traffic will be redirected to one of the backend Pods.
+
+Similar to iptables, Ipvs is based on netfilter hook function, but uses hash table as the underlying data structure and works in the kernel space. That means ipvs redirects traffic much faster, and has much better performance when syncing proxy rules. Furthermore, ipvs provides more options for load balancing algorithm, such as:
+
+* `rr`
+  : round-robin
+* `lc`
+  : least connection
+* `dh`
+  : destination hashing
+* `sh`
+  : source hashing
+* `sed`
+  : shortest expected delay
+* `nq`
+  : never queue
+
+**Note:**ipvs mode assumes IPVS kernel modules are installed on the node before running kube-proxy. When kube-proxy starts with ipvs proxy mode, kube-proxy would validate if IPVS modules are installed on the node, if it’s not installed kube-proxy will fall back to iptables proxy mode.
 
 
 
