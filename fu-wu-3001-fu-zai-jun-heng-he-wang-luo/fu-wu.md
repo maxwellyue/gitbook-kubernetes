@@ -130,10 +130,32 @@ Similar to iptables, Ipvs is based on netfilter hook function, but uses hash tab
 * `sed`: shortest expected delay
 * `nq`: never queue
 
-**Note:**ipvs mode assumes IPVS kernel modules are installed on the node before running kube-proxy. When kube-proxy starts with ipvs proxy mode, kube-proxy would validate if IPVS modules are installed on the node, if it’s not installed kube-proxy will fall back to iptables proxy mode.![](/assets/屏幕快照 2018-03-18 下午7.02.33.png)在这些代理模式中，任何绑定到该服务IP:PORT的流量都会被代理到一个适当的后端中，而客户端不会知道任何关于Kubernetes、Service或者Pods的信息。
+**Note:**ipvs mode assumes IPVS kernel modules are installed on the node before running kube-proxy. When kube-proxy starts with ipvs proxy mode, kube-proxy would validate if IPVS modules are installed on the node, if it’s not installed kube-proxy will fall back to iptables proxy mode.![](/assets/屏幕快照 2018-03-18 下午7.02.33.png)在这些代理模式中，任何绑定到该服务IP:PORT的流量都会被代理到一个适当的后端中，而客户端不会知道任何关于Kubernetes、Service或者Pods的信息。Client-IP based session affinity can be selected by setting`service.spec.sessionAffinity`to “ClientIP” \(the default is “None”\), and you can set the max session sticky time by setting the field`service.spec.sessionAffinityConfig.clientIP.timeoutSeconds`if you have already set`service.spec.sessionAffinity`to “ClientIP” \(the default is “10800”\).
 
-. Client-IP based session affinity can be selected by setting`service.spec.sessionAffinity`to “ClientIP” \(the default is “None”\), and you can set the max session sticky time by setting the field`service.spec.sessionAffinityConfig.clientIP.timeoutSeconds`if you have already set`service.spec.sessionAffinity`to “ClientIP” \(the default is “10800”\).
+## 多端口 Services {#multi-port-services}
 
-  
+---
+
+很多Service需要暴露不止一个端口。在这种情况下，Kubernetes支持对同一个Service对象定义多个端口。当使用多个端口时，你必须给定所有的端口名字，这样endpoints才不会有歧义。比如：
+
+```
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: MyApp
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 9376
+  - name: https
+    protocol: TCP
+    port: 443
+    targetPort: 9377
+```
+
 
 
