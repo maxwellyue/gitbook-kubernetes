@@ -105,7 +105,7 @@ Kubernetes集群中的每一个节点上都会运行一个`kube-proxy`。`kube-p
 
 ### 代理模式：userspace
 
-在这种模式下，kube-proxy会监听Kubernetes Master中的Service和Endpoints的新增和移除。它会为每一个Service在本地节点上打开一个端口（随机选择）。任何该代理端口的连接都会被代理到该Service的一个Pod上（被记录在Endpoints中）。使用哪个Pod是由Service的`SessionAffinity`决定的。Lastly, it installs iptables rules which capture traffic to the`Service`’s`clusterIP`\(which is virtual\) and`Port`and redirects that traffic to the proxy port which proxies the backend`Pod`. By default, the choice of backend is round robin.![](/assets/屏幕快照 2018-03-18 下午6.48.08.png)
+在这种模式下，kube-proxy会监听Kubernetes Master中的Service和Endpoints的新增和移除。它会为每一个Service在本地节点上打开一个端口（随机选择）。任何该代理端口的连接都会被代理到该Service的一个Pod上（被记录在Endpoints中）。使用哪个Pod是由Service的`SessionAffinity`决定的。Lastly, it installs iptables rules which capture traffic to the`Service`’s`clusterIP`\(which is virtual\) and`Port`and redirects that traffic to the proxy port which proxies the backend`Pod`. By default, the choice of backend is round robin.
 
 上图中的ServiceIP就是clusterIP。
 
@@ -113,7 +113,7 @@ Kubernetes集群中的每一个节点上都会运行一个`kube-proxy`。`kube-p
 
 在这种模式下，kube-proxy会监听Kubernetes Master中的Service和Endpoints的新增和移除。对每一个Service，it installs iptables rules which capture traffic to the`Service`’s`clusterIP`\(which is virtual\) and`Port`and redirects that traffic to one of the`Service`’s backend sets. For each`Endpoints`object, it installs iptables rules which select a backend`Pod`. By default, the choice of backend is random.
 
-显然，iptables不需要在userspace和kernelspace之间切换，它比userspace代理更快，更可靠。However, unlike the userspace proxier, the iptables proxier cannot automatically retry another`Pod`if the one it initially selects does not respond, so it depends on having working[readiness probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#defining-readiness-probes).![](/assets/屏幕快照 2018-03-18 下午6.55.27.png)上图中的ServiceIP就是clusterIP。
+显然，iptables不需要在userspace和kernelspace之间切换，它比userspace代理更快，更可靠。However, unlike the userspace proxier, the iptables proxier cannot automatically retry another`Pod`if the one it initially selects does not respond, so it depends on having working[readiness probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#defining-readiness-probes).上图中的ServiceIP就是clusterIP。
 
 ### 代理模式: ipvs {#proxy-mode-ipvs}
 
@@ -130,7 +130,7 @@ Similar to iptables, Ipvs is based on netfilter hook function, but uses hash tab
 * `sed`: shortest expected delay
 * `nq`: never queue
 
-**Note:**ipvs mode assumes IPVS kernel modules are installed on the node before running kube-proxy. When kube-proxy starts with ipvs proxy mode, kube-proxy would validate if IPVS modules are installed on the node, if it’s not installed kube-proxy will fall back to iptables proxy mode.![](/assets/屏幕快照 2018-03-18 下午7.02.33.png)在这些代理模式中，任何绑定到该服务IP:PORT的流量都会被代理到一个适当的后端中，而客户端不会知道任何关于Kubernetes、Service或者Pods的信息。Client-IP based session affinity can be selected by setting`service.spec.sessionAffinity`to “ClientIP” \(the default is “None”\), and you can set the max session sticky time by setting the field`service.spec.sessionAffinityConfig.clientIP.timeoutSeconds`if you have already set`service.spec.sessionAffinity`to “ClientIP” \(the default is “10800”\).
+**Note:**ipvs mode assumes IPVS kernel modules are installed on the node before running kube-proxy. When kube-proxy starts with ipvs proxy mode, kube-proxy would validate if IPVS modules are installed on the node, if it’s not installed kube-proxy will fall back to iptables proxy mode.在这些代理模式中，任何绑定到该服务IP:PORT的流量都会被代理到一个适当的后端中，而客户端不会知道任何关于Kubernetes、Service或者Pods的信息。Client-IP based session affinity can be selected by setting`service.spec.sessionAffinity`to “ClientIP” \(the default is “None”\), and you can set the max session sticky time by setting the field`service.spec.sessionAffinityConfig.clientIP.timeoutSeconds`if you have already set`service.spec.sessionAffinity`to “ClientIP” \(the default is “10800”\).
 
 ## 多端口 Services {#multi-port-services}
 
@@ -157,5 +157,44 @@ spec:
     targetPort: 9377
 ```
 
+## 选择你自己的IP地址 {#choosing-your-own-ip-address}
+
+---
+
+你可以在创建Service的时候，指定你自己的IP地址。你只需要设置`spec.clusterIP`属性即可。比如，如果你有一个想替换的已存在的DNS entry，或者一个很难重新配置的且已经配置了特定IP的遗留系统。用户指定的IP地址必须是一个有效的IP地址，并且在`service-cluster-ip-range`范围内。如果该IP地址无效，apiserver 将会返回一个422的 HTTP 的状态码，来指示值无效。
+
+### 为什么不使用 round-robin DNS? {#why-not-use-round-robin-dns}
+
+一个总是被提起的问题是，为什么我们要使用虚拟IP，而不直接使用标准的round-robin DNS。下面是一些原因：
+
+* DNS库并不respect DNS TTLs，并会缓存域名查找结果。
+* 很多apps会做DNS查找，并缓存查找结果。
+* 即使应用和依赖库做了恰当的重新解析，每一个客户端一遍一遍地重解析DNS将会很难管理。
+
+我们尝试阻止用户做自我伤害的事情。这就是说，如果有足够多的人要求使用round-robin DNS，我们可能会实现它来作为一种选择。
+
+## 发现services {#discovering-services}
+
+---
+
+Kubernetes主要支持2种找到服务的方式：环境变量和DNS。
+
+### 环境变量 {#environment-variables}
+
+当一个Pod运行在节点上的时候，kubelet会为每一个活着的Service添加一系列的环境变量。它同时支持[Docker links compatible](https://docs.docker.com/userguide/dockerlinks/)类型的变量 \(见[makeLinkVariables](http://releases.k8s.io/master/pkg/kubelet/envvars/envvars.go#L49)\)和简单的`{SVCNAME}_SERVICE_HOST`和`{SVCNAME}_SERVICE_PORT`变量，其中，Service名字是大写的，中间是下划线。
+
+例如，`"redis-master"`Service暴露TCP端口7369，并被分配了一个集群IP地址10.0.0.11，将会产生如下环境变量： 
+
+```
+REDIS_MASTER_SERVICE_HOST=10.0.0.11
+REDIS_MASTER_SERVICE_PORT=6379
+REDIS_MASTER_PORT=tcp://10.0.0.11:6379
+REDIS_MASTER_PORT_6379_TCP=tcp://10.0.0.11:6379
+REDIS_MASTER_PORT_6379_TCP_PROTO=tcp
+REDIS_MASTER_PORT_6379_TCP_PORT=6379
+REDIS_MASTER_PORT_6379_TCP_ADDR=10.0.0.11
+```
+
+  
 
 
