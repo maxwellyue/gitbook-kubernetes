@@ -244,6 +244,40 @@ Kubernetes中的`ServiceTypes`允许你定义服务类型，默认是`ClusterIP`
 * `LoadBalancer`: 使用云提供商的负载均衡向外部暴露服务。`NodePort`和`ClusterIP`服务将会被自动创建，外部负载均衡将路由到它们上面。
 * `ExternalName`: 将服务映射到`externalName`字段指定的内容上\(例如，`foo.bar.example.com`\)，by returning a`CNAME`record with its value. 这种类型的服务不会设置任何类型的代理。需要1.7或更高版本的`kube-dns`。
 
-  
+### NodePort类型 {#type-nodeport}
+
+如果你将服务类型`type`属性设置为`"NodePort"`，Kubernetes的master将会从某一范围（默认是30000-32767）分配一个端口，并且每一个节点都会代理该端口（每个节点上的端口号都相同）到你的服务上。该端口将会记录在你服务的`spec.ports[*].nodePort`属性上。
+
+如果你想要设置一个特定的端口号，你可以为`nodePort`字段设定一个特定值，那么Kubernetes将会为你分配该端口或者API交互失败（比如，可能端口冲突了）。你设置的这个端口号的值必须在配置的节点端口范围内。 
+
+这会允许开发者自由地设置他们自己的负载均衡器，去配置kubernetes并不完全支持的环境，或者仅仅去直接暴露一个或者更多节点IP。
+
+注意，服务可以通过`<NodeIP>:spec.ports[*].nodePort`和`spec.clusterIP:spec.ports[*].port`这两种方式可见。
+
+### LoadBalancer类型
+
+如果云提供商支持外部负载均衡器，那么将服务类型`type`设置为`"LoadBalancer"`将会为你的服务提供一个负载均衡器。 负载均衡器的实际创建是异步进行的，负载均衡器的信息将可以从该服务的`status.loadBalancer`属性中看到。比如：
+
+```
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: MyApp
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9376
+  clusterIP: 10.0.171.239
+  loadBalancerIP: 78.11.24.19
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+    - ip: 146.148.47.155
+```
+
 
 
