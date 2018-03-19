@@ -229,5 +229,21 @@ The Kubernetes DNS server is the only way to access services of type`ExternalNam
 
 * A records for any`Endpoints`that share a name with the service, for all other types.
 
+## 发布services - service类型 {#publishing-services---service-types}
+
+---
+
+对于你的一部分应用而言（比如frontends），你可能想要向外部暴露你服务的IP地址。
+
+Kubernetes中的`ServiceTypes`允许你定义服务类型，默认是`ClusterIP`。
+
+服务的类型以及它们的行为如下：
+
+* `ClusterIP`: 以集群内IP暴露一个服务。选择该类型，那么该服务只能在集群内可达。这是默认的类型。
+* `NodePort`: 将服务以一个节点IP和静态端口的方式进行暴露。这种方式将会自动创建一个`ClusterIP`类型的服务，负责路由`NodePort`服务。在集群外，你可以通过请求`<NodeIP>:<NodePort>`来访问`NodePort`类型的服务。
+* `LoadBalancer`: 使用云提供商的负载均衡向外部暴露服务。`NodePort`和`ClusterIP`服务将会被自动创建，外部负载均衡将路由到它们上面。
+* `ExternalName`: 将服务映射到`externalName`字段指定的内容上\(例如，`foo.bar.example.com`\)，by returning a`CNAME`record with its value. 这种类型的服务不会设置任何类型的代理。需要1.7或更高版本的`kube-dns`。
+
+  
 
 
