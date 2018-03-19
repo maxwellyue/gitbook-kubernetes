@@ -211,29 +211,23 @@ The Kubernetes DNS server is the only way to access services of type`ExternalNam
 
 ---
 
-Sometimes you don’t need or want load-balancing and a single service IP. In this case, you can create “headless” services by specifying`"None"`for the cluster IP \(`spec.clusterIP`\).
+有时候，你并不需要负载均衡和单一的服务IP。此时，你可以通过将集群IP\(`spec.clusterIP`\)设置为None来创建“headless” Service。
 
-This option allows developers to reduce coupling to the Kubernetes system by allowing them freedom to do discovery their own way. Applications can still use a self-registration pattern and adapters for other discovery systems could easily be built upon this API.
+这种操作允许开发者降低对Kubernetes的耦合，允许他们以他们自己的方式去发现服务。应用依然可以使用一种自注册的方式，其他发现系统的适配器可以很容易地建立在这套API之上。
 
-For such`Services`, a cluster IP is not allocated, kube-proxy does not handle these services, and there is no load balancing or proxying done by the platform for them. How DNS is automatically configured depends on whether the service has selectors defined.
+对于这种Service，不会被分配集群IP，kube-proxy也不会处理这些services，平台也不会为它们做负载均衡或者代理。DNS如何自动配置取决于该服务是否定义了选择器。
 
-### With selectors {#with-selectors}
+### 有选择器
 
-For headless services that define selectors, the endpoints controller creates`Endpoints`records in the API, and modifies the DNS configuration to return A records \(addresses\) that point directly to the`Pods`backing the`Service`.
+对于定义了选择器的headless services，endpoints controller会创建Endpoints记录，并修改DNS配置来返回一个地址记录，该地址记录直接指向Service背后的Pods。
 
-### Without selectors {#without-selectors}
+### 没有选择器 {#without-selectors}
 
-For headless services that do not define selectors, the endpoints controller does not create`Endpoints`records. However, the DNS system looks for and configures either:
+对于没有定义选择器的headless services，endpoints controller不会创建Endpoints记录。但是，DNS系统会查找和配置以下内容：
 
-* CNAME records for
-  `ExternalName`
-  -type services.
-* A records for any
-  `Endpoints`
-  that share a name with the service, for all other types.
+* CNAME records for`ExternalName`-type services.
 
-  
-  
-  
+* A records for any`Endpoints`that share a name with the service, for all other types.
+
 
 
