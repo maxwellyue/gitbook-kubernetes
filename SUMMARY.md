@@ -46,7 +46,7 @@
   * Secrets
 * [服务、负载均衡和网络](fu-wu-3001-fu-zai-jun-heng-he-wang-luo.md)
   * [服务](fu-wu-3001-fu-zai-jun-heng-he-wang-luo/fu-wu.md)
-  * 服务和Pods的DNS
+  * [服务和Pods的DNS](fu-wu-3001-fu-zai-jun-heng-he-wang-luo/fu-wu-he-pods-de-dns.md)
   * 连接应用和服务
   * Ingress
   * 网络策略
